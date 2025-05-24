@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repo.Data;
 
@@ -11,9 +12,11 @@ using Repo.Data;
 namespace Repo.Migrations
 {
     [DbContext(typeof(TheShineDbContext))]
-    partial class TheShineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250524145648_removeUserId")]
+    partial class removeUserId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -951,8 +954,10 @@ namespace Repo.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -1048,8 +1053,7 @@ namespace Repo.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex(new[] { "Email" }, "UQ__users__AB6E6164023178F8")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex(new[] { "Phone" }, "UQ__users__B43B145FB0B35F61")
                         .IsUnique()

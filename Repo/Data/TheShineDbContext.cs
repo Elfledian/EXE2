@@ -275,9 +275,9 @@ namespace Repo.Data
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(e => e.UserId).HasName("PK__users__B9BE370FA57EB208");
+                entity.HasKey(e => e.Id).HasName("PK__users__B9BE370FA57EB208");
 
-                entity.Property(e => e.UserId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
                 entity.Property(e => e.Location).HasDefaultValue("Ho Chi Minh City");
                 entity.Property(e => e.RememberMe).HasDefaultValue(false);
