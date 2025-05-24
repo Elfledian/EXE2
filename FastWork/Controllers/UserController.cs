@@ -65,9 +65,9 @@ namespace FastWork.Controllers
             if (result.Succeeded)
             {
                 // Ensure the "Customer" role exists
-                if (!await _roleManager.RoleExistsAsync("Customer"))
+                if (!await _roleManager.RoleExistsAsync("Candidate"))
                 {
-                    var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Customer", NormalizedName = "CUSTOMER" });
+                    var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Candidate", NormalizedName = "CANDIDATE" });
                     if (!roleResult.Succeeded)
                     {
                         // Rollback user creation if role creation fails
@@ -77,7 +77,7 @@ namespace FastWork.Controllers
                 }
 
                 // Add the user to the "Customer" role
-                var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Customer");
+                var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Candidate");
                 if (!roleAssignmentResult.Succeeded)
                 {
                     // Log the error and return a failure response

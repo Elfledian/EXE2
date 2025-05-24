@@ -11,7 +11,7 @@ namespace Repo
     {
         public static async Task SeedRoles(RoleManager<IdentityRole<Guid>> roleManager)
         {
-            string[] roleNames = { "Customer", "Admin", "Recruiter" }; // Add other roles as needed
+            string[] roleNames = { "Customer", "Admin", "Recruiter","Candidate" }; // Add other roles as needed
             foreach (var roleName in roleNames)
             {
                 var roleExists = await roleManager.RoleExistsAsync(roleName);
