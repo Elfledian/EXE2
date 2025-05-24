@@ -15,10 +15,6 @@ namespace Repo.Entities;
 [Index("GoogleId", Name = "UQ__users__CCBDE7DC88483CA3", IsUnique = true)]
 public partial class User : IdentityUser<Guid>
 {
-    [Key]
-    [Column("user_id")]
-    public Guid UserId { get; set; }
-
     [Column("role")]
     [StringLength(50)]
     public string Role { get; set; }
@@ -28,19 +24,9 @@ public partial class User : IdentityUser<Guid>
     [StringLength(100)]
     public string Name { get; set; }
 
-    [Required]
-    [Column("email")]
-    [StringLength(100)]
-    public string Email { get; set; }
-
     [Column("phone")]
     [StringLength(20)]
     public string Phone { get; set; }
-
-    [Required]
-    [Column("password_hash")]
-    [StringLength(255)]
-    public string PasswordHash { get; set; }
 
 
     [Column("google_id")]
