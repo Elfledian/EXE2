@@ -12,8 +12,8 @@ using Repo.Data;
 namespace Repo.Migrations
 {
     [DbContext(typeof(TheShineDbContext))]
-    [Migration("20250522165218_7")]
-    partial class _7
+    [Migration("20250526054959_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -935,10 +935,9 @@ namespace Repo.Migrations
 
             modelBuilder.Entity("Repo.Entities.User", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("user_id")
                         .HasDefaultValueSql("(newid())");
 
                     b.Property<int>("AccessFailedCount")
@@ -955,10 +954,8 @@ namespace Repo.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
-                        .HasColumnName("email");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -967,9 +964,6 @@ namespace Repo.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("google_id");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Location")
                         .ValueGeneratedOnAdd()
@@ -999,10 +993,7 @@ namespace Repo.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("password_hash");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
@@ -1048,7 +1039,7 @@ namespace Repo.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("UserId")
+                    b.HasKey("Id")
                         .HasName("PK__users__B9BE370FA57EB208");
 
                     b.HasIndex("NormalizedEmail")
@@ -1060,7 +1051,8 @@ namespace Repo.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex(new[] { "Email" }, "UQ__users__AB6E6164023178F8")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
 
                     b.HasIndex(new[] { "Phone" }, "UQ__users__B43B145FB0B35F61")
                         .IsUnique()
