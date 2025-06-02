@@ -29,10 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="appsettings.json">
+    <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>
