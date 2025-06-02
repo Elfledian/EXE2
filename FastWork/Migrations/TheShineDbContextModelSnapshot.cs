@@ -7,7 +7,7 @@ using Repo.Data;
 
 #nullable disable
 
-namespace Repo.Migrations
+namespace FastWork.Migrations
 {
     [DbContext(typeof(TheShineDbContext))]
     partial class TheShineDbContextModelSnapshot : ModelSnapshot
