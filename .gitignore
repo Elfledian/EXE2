@@ -44,6 +44,8 @@ Generated\ Files/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+# Migration files
+[Mm]igrations/
 
 # NUnit
 *.VisualState.xml
@@ -397,3 +399,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/Repo/Migrations
