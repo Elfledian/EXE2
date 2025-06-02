@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Repo.Data;
 
-namespace FastWork.GenericRepository
+namespace Repo.GenericRepository
 {
     public class GenericRepository<T> : IGenericRepository<T>
        where T : class

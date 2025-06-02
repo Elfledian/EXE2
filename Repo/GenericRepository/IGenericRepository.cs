@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FastWork.GenericRepository
+namespace Repo.GenericRepository
 {
     public interface IGenericRepository<T>
         where T : class
