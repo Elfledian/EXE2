@@ -10,7 +10,10 @@ using Microsoft.OpenApi.Models;
 using Repo;
 using Repo.Data;
 using Repo.Entities;
+using Repo.Repositories;
 using Service;
+using Service.DTO;
+using Service.Services;
 using Service.Services.EmailService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -24,6 +27,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<PayOSService>();
+builder.Services.AddScoped<PaymentRepo>();
 builder.Services.AddDbContext<TheShineDbContext>();
 
 //builder.Services.AddIdentity<User, IdentityRole<Guid>>()
@@ -42,6 +47,8 @@ builder.Services.AddHangfire(config => config
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddHangfireServer();
+builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
+
 
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<TheShineDbContext>()
