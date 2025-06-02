@@ -29,10 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </None>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
