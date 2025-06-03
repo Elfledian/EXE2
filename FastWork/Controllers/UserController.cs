@@ -153,7 +153,7 @@ namespace FastWork.Controllers
                 Console.WriteLine($"Role 'Customer' assigned to user {user.Email}");
 
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = $"{_frontendUrl}/api/User/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+                var confirmationLink = $"{_frontendUrl}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
                 var emailBody = EmailBodyTemplate.GetRegistrationConfirmationEmail(user.Name, confirmationLink);
 
                 _emailSenderService.SendEmail(user.Email, "Confirm Your Email", emailBody);
