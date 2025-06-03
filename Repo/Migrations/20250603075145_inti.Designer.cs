@@ -11,8 +11,8 @@ using Repo.Data;
 namespace Repo.Migrations
 {
     [DbContext(typeof(TheShineDbContext))]
-    [Migration("20250526172119_init")]
-    partial class init
+    [Migration("20250603075145_inti")]
+    partial class inti
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

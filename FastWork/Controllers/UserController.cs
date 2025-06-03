@@ -61,10 +61,10 @@ namespace FastWork.Controllers
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, "admin"); //create admin password admin
+            var result = await _userManager.CreateAsync(user, "Admin1?"); //create admin password admin
             if (result.Succeeded)
             {
-                // Ensure the "Customer" role exists
+                // Ensure the "Admin" role exists
                 if (!await _roleManager.RoleExistsAsync("Admin"))
                 {
                     var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN" });
@@ -76,7 +76,7 @@ namespace FastWork.Controllers
                     }
                 }
 
-                // Add the user to the "Customer" role
+                // Add the user to the "Admin" role
                 var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Admin");
                 if (!roleAssignmentResult.Succeeded)
                 {
@@ -89,7 +89,7 @@ namespace FastWork.Controllers
 
                 Console.WriteLine($"Role 'Admin' assigned to user {user.Email}");
 
-                return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Admin creation successful."));
+                return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Admin creation successfully."));
             }
 
             var identityErrors = result.Errors

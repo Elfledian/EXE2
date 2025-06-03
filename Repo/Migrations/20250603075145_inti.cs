@@ -6,10 +6,8 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace Repo.Migrations
 {
-    /// <inheritdoc />
-    public partial class init : Migration
+    public partial class inti : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -19,7 +17,7 @@ namespace Repo.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
@@ -31,10 +29,10 @@ namespace Repo.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "users",
+                name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     role = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     phone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true),
@@ -42,8 +40,8 @@ namespace Repo.Migrations
                     remember_me = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: false),
                     terms_agreed = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: false),
                     location = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, defaultValue: "Ho Chi Minh City"),
-                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+                    created_at = table.Column<DateTime>(type: "datetime", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
@@ -69,7 +67,7 @@ namespace Repo.Migrations
                 name: "categories",
                 columns: table => new
                 {
-                    category_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    category_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     sub_items = table.Column<string>(type: "longtext", nullable: false)
                 },
@@ -83,7 +81,7 @@ namespace Repo.Migrations
                 name: "tags",
                 columns: table => new
                 {
-                    tag_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    tag_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -128,9 +126,9 @@ namespace Repo.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUserClaims_users_UserId",
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -149,9 +147,9 @@ namespace Repo.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        name: "FK_AspNetUserLogins_users_UserId",
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -174,9 +172,9 @@ namespace Repo.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AspNetUserRoles_users_UserId",
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -195,9 +193,9 @@ namespace Repo.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
-                        name: "FK_AspNetUserTokens_users_UserId",
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -207,7 +205,7 @@ namespace Repo.Migrations
                 name: "candidates",
                 columns: table => new
                 {
-                    candidate_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    candidate_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Chua nh?n vi?c"),
                     gender = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -222,7 +220,7 @@ namespace Repo.Migrations
                     table.ForeignKey(
                         name: "FK__candidate__user___4CA06362",
                         column: x => x.user_id,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -232,7 +230,7 @@ namespace Repo.Migrations
                 name: "notifications",
                 columns: table => new
                 {
-                    notification_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    notification_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     message = table.Column<string>(type: "longtext", nullable: false),
                     type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -245,7 +243,7 @@ namespace Repo.Migrations
                     table.ForeignKey(
                         name: "FK__notificat__user___2645B050",
                         column: x => x.user_id,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -255,7 +253,7 @@ namespace Repo.Migrations
                 name: "ratings",
                 columns: table => new
                 {
-                    rating_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    rating_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     reviewer_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     rating = table.Column<int>(type: "int", nullable: true),
                     comment = table.Column<string>(type: "longtext", nullable: true),
@@ -268,7 +266,7 @@ namespace Repo.Migrations
                     table.ForeignKey(
                         name: "FK__ratings__reviewe__18EBB532",
                         column: x => x.reviewer_id,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
@@ -277,7 +275,7 @@ namespace Repo.Migrations
                 name: "recruiters",
                 columns: table => new
                 {
-                    recruiter_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    recruiter_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     company_type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     scale = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -290,7 +288,7 @@ namespace Repo.Migrations
                     table.ForeignKey(
                         name: "FK__recruiter__user___59FA5E80",
                         column: x => x.user_id,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -300,7 +298,7 @@ namespace Repo.Migrations
                 name: "verifications",
                 columns: table => new
                 {
-                    verification_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    verification_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     blockchain_hash = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Pending"),
@@ -312,7 +310,7 @@ namespace Repo.Migrations
                     table.ForeignKey(
                         name: "FK__verificat__user___1F98B2C1",
                         column: x => x.user_id,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -322,7 +320,7 @@ namespace Repo.Migrations
                 name: "cv_details",
                 columns: table => new
                 {
-                    cv_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    cv_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     full_name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     contact_email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
@@ -338,7 +336,7 @@ namespace Repo.Migrations
                     languages = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
                     desired_salary = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -356,7 +354,7 @@ namespace Repo.Migrations
                 name: "files",
                 columns: table => new
                 {
-                    file_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    file_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     file_name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
                     file_type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -380,7 +378,7 @@ namespace Repo.Migrations
                 name: "work_history",
                 columns: table => new
                 {
-                    history_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    history_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     date = table.Column<DateOnly>(type: "date", nullable: false),
                     content = table.Column<string>(type: "longtext", nullable: false),
@@ -402,7 +400,7 @@ namespace Repo.Migrations
                 name: "subscriptions",
                 columns: table => new
                 {
-                    subscription_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    subscription_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     plan = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     subtitle = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
@@ -433,7 +431,7 @@ namespace Repo.Migrations
                 name: "companies",
                 columns: table => new
                 {
-                    company_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    company_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     company_name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     website = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
@@ -446,7 +444,7 @@ namespace Repo.Migrations
                     table.ForeignKey(
                         name: "FK__companies__recru__52593CB8",
                         column: x => x.recruiter_id,
-                        principalTable: "users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -462,7 +460,7 @@ namespace Repo.Migrations
                 name: "jobs",
                 columns: table => new
                 {
-                    job_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    job_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     company_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     subscription_id = table.Column<Guid>(type: "char(36)", nullable: true),
@@ -516,7 +514,7 @@ namespace Repo.Migrations
                 name: "applications",
                 columns: table => new
                 {
-                    application_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    application_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     job_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Applied"),
@@ -546,7 +544,7 @@ namespace Repo.Migrations
                 name: "invitations",
                 columns: table => new
                 {
-                    invitation_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    invitation_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     job_id = table.Column<Guid>(type: "char(36)", nullable: true),
@@ -605,7 +603,7 @@ namespace Repo.Migrations
                 name: "payments",
                 columns: table => new
                 {
-                    payment_id = table.Column<Guid>(type: "char(36)", nullable: false, defaultValueSql: "(UUID())"),
+                    payment_id = table.Column<Guid>(type: "char(36)", nullable: false ),
                     application_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Pending"),
@@ -662,30 +660,30 @@ namespace Repo.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
-                table: "users",
+                table: "AspNetUsers",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UQ__users__AB6E6164023178F8",
-                table: "users",
+                table: "AspNetUsers",
                 column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UQ__users__B43B145FB0B35F61",
-                table: "users",
+                table: "AspNetUsers",
                 column: "phone",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UQ__users__CCBDE7DC88483CA3",
-                table: "users",
+                table: "AspNetUsers",
                 column: "google_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
-                table: "users",
+                table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
 
@@ -884,7 +882,7 @@ namespace Repo.Migrations
                 name: "candidates");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "AspNetUsers");
         }
     }
 }
