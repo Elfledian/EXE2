@@ -35,6 +35,69 @@ namespace FastWork.Controllers
             _frontendUrl = configuration["Url:Frontend"] ?? "https://youtube.com";
         }
 
+        [HttpPost("admin")]
+        public async Task<IActionResult> Register()
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToArray();
+                return BadRequest(new AppResponse<object>().SetErrorResponse("ModelState", errors));
+            }
+
+            var existingUser = await _userManager.FindByEmailAsync("admin");
+            if (existingUser != null)
+            {
+                return BadRequest(new AppResponse<object>().SetErrorResponse("Email", new[] { "Email is already registered." }));
+            }
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(), // Set the Id property directly
+                UserName = "admin",
+                Email = "admin",
+                Name = "admin",
+                Phone = "admin",
+                CreatedAt = DateTime.UtcNow,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, "admin"); //create admin password admin
+            if (result.Succeeded)
+            {
+                // Ensure the "Customer" role exists
+                if (!await _roleManager.RoleExistsAsync("Admin"))
+                {
+                    var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN" });
+                    if (!roleResult.Succeeded)
+                    {
+                        // Rollback user creation if role creation fails
+                        await _userManager.DeleteAsync(user);
+                        return BadRequest(new AppResponse<object>().SetErrorResponse("RoleCreation", roleResult.Errors.Select(e => e.Description).ToArray()));
+                    }
+                }
+
+                // Add the user to the "Customer" role
+                var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Admin");
+                if (!roleAssignmentResult.Succeeded)
+                {
+                    // Log the error and return a failure response
+                    Console.WriteLine($"Error adding role: {string.Join(", ", roleAssignmentResult.Errors.Select(e => e.Description))}");
+                    // Rollback user creation
+                    await _userManager.DeleteAsync(user);
+                    return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
+                }
+
+                Console.WriteLine($"Role 'Admin' assigned to user {user.Email}");
+
+                return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Admin creation successful."));
+            }
+
+            var identityErrors = result.Errors
+                .Where(e => e.Code != "DuplicateUserName")
+                .GroupBy(e => e.Code)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
+            return BadRequest(new AppResponse<object>().SetErrorResponse(identityErrors));
+        }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
