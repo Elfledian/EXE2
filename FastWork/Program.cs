@@ -18,7 +18,16 @@ using System.IdentityModel.Tokens.Jwt;
 using FastWork.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost5173",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 // Add logging first to capture all events
 builder.Services.AddLogging(logging =>
 {
@@ -193,7 +202,7 @@ app.Map("/{**catchAll}", (HttpContext context) =>
 });
 
 app.MapControllers();
-
+app.UseCors("AllowLocalhost5173");
 // Add a health check endpoint to verify routing
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Time = DateTime.Now }));
 
