@@ -715,11 +715,6 @@ namespace Repo.Migrations
                 column: "candidate_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_files_candidate_id",
-                table: "files",
-                column: "candidate_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_invitations_candidate_id",
                 table: "invitations",
                 column: "candidate_id");

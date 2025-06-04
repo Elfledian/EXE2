@@ -51,22 +51,30 @@ namespace Repo.Data
         public virtual DbSet<Verification> Verifications { get; set; }
 
         public virtual DbSet<WorkHistory> WorkHistories { get; set; }
-        public static string GetConnectionString(string connectionStringName)
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json")
-                .Build();
+        //public static string GetConnectionString(string connectionStringName)
+        //{
+        //    var config = new ConfigurationBuilder()
+        //        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+        //        .AddJsonFile("appsettings.json")
+        //        .Build();
 
-            string connectionString = config.GetConnectionString(connectionStringName);
-            return connectionString;
+        //    string connectionString = config.GetConnectionString(connectionStringName);
+        //    return connectionString;
+        //}
+        private string GetConnectionString()
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", true, true)
+                        .Build();
+            return config.GetConnectionString("DefaultConnection");
         }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //    => optionsBuilder.UseSqlServer(GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySQL(GetConnectionString("DefaultConnection"));
+            => optionsBuilder.UseMySQL(GetConnectionString());
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,8 +83,7 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.ApplicationId).HasName("PK__applicat__3BCBDCF27B586E0C");
 
-                entity.Property(e => e.ApplicationId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.AppliedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.AppliedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Applied");
 
                 entity.HasOne(d => d.Candidate).WithMany(p => p.Applications).HasConstraintName("FK__applicati__candi__03F0984C");
@@ -105,15 +112,13 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.CategoryId).HasName("PK__categori__D54EE9B4DDD25EB7");
 
-                entity.Property(e => e.CategoryId).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<Company>(entity =>
             {
                 entity.HasKey(e => e.CompanyId).HasName("PK__companie__3E267235299690E3");
 
-                entity.Property(e => e.CompanyId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.LogoFile).WithMany(p => p.Companies)
                     .OnDelete(DeleteBehavior.SetNull)
@@ -128,9 +133,8 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.CvId).HasName("PK__cv_detai__C36883E6681921B8");
 
-                entity.Property(e => e.CvId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.Candidate).WithMany(p => p.CvDetails)
                     .OnDelete(DeleteBehavior.Cascade)
@@ -141,12 +145,11 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.FileId).HasName("PK__files__07D884C68CA1CF9F");
 
-                entity.Property(e => e.FileId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.UploadDate).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.UploadDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                entity.HasOne(d => d.Candidate).WithMany(p => p.Files)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .HasConstraintName("FK__files__candidate__2BFE89A6");
+                //entity.HasOne(d => d.Candidate).WithMany(p => p.Files)
+                //    .OnDelete(DeleteBehavior.SetNull)
+                //    .HasConstraintName("FK__files__candidate__2BFE89A6");
             });
 
             modelBuilder.Entity<Invitation>(entity =>
@@ -154,7 +157,7 @@ namespace Repo.Data
                 entity.HasKey(e => e.InvitationId).HasName("PK__invitati__94B74D7C19DB176C");
 
                 entity.Property(e => e.InvitationId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.SentAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.SentAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Pending");
 
                 entity.HasOne(d => d.Candidate).WithMany(p => p.Invitations).HasConstraintName("FK__invitatio__candi__0B91BA14");
@@ -173,7 +176,7 @@ namespace Repo.Data
                 entity.Property(e => e.JobId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.IsUrgent).HasDefaultValue(false);
                 entity.Property(e => e.Location).HasDefaultValue("Ho Chi Minh City");
-                entity.Property(e => e.PostedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.PostedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Open");
 
                 entity.HasOne(d => d.Category).WithMany(p => p.Jobs)
@@ -212,7 +215,7 @@ namespace Repo.Data
                 entity.HasKey(e => e.NotificationId).HasName("PK__notifica__E059842F6357338B");
 
                 entity.Property(e => e.NotificationId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.IsRead).HasDefaultValue(false);
 
                 entity.HasOne(d => d.User).WithMany(p => p.Notifications)
@@ -237,7 +240,7 @@ namespace Repo.Data
                 entity.HasKey(e => e.RatingId).HasName("PK__ratings__D35B278B9864B1A5");
 
                 entity.Property(e => e.RatingId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.Reviewer).WithMany(p => p.Ratings).HasConstraintName("FK__ratings__reviewe__18EBB532");
             });
@@ -260,7 +263,7 @@ namespace Repo.Data
 
                 entity.Property(e => e.SubscriptionId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.CandidatesManagement).HasDefaultValue(false);
-                entity.Property(e => e.StartDate).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.StartDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Active");
                 entity.Property(e => e.UrgentHiring).HasDefaultValue(false);
 
@@ -281,11 +284,11 @@ namespace Repo.Data
                 entity.HasKey(e => e.Id).HasName("PK__users__B9BE370FA57EB208");
 
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Location).HasDefaultValue("Ho Chi Minh City");
                 entity.Property(e => e.RememberMe).HasDefaultValue(false);
                 entity.Property(e => e.TermsAgreed).HasDefaultValue(false);
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             modelBuilder.Entity<Verification>(entity =>
@@ -305,7 +308,7 @@ namespace Repo.Data
                 entity.HasKey(e => e.HistoryId).HasName("PK__work_his__096AA2E992B2BFDA");
 
                 entity.Property(e => e.HistoryId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.Candidate).WithMany(p => p.WorkHistories)
                     .OnDelete(DeleteBehavior.Cascade)
