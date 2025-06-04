@@ -9,6 +9,7 @@ using Service.Services.EmailService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FastWork.Controllers
 {
@@ -52,7 +53,7 @@ namespace FastWork.Controllers
 
             var user = new User
             {
-                Id = Guid.NewGuid(), // Set the Id property directly
+                Id = Guid.NewGuid(),
                 UserName = "admin",
                 Email = "admin",
                 Name = "admin",
@@ -61,28 +62,23 @@ namespace FastWork.Controllers
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, "Admin1?"); //create admin password admin
+            var result = await _userManager.CreateAsync(user, "Admin1?");
             if (result.Succeeded)
             {
-                // Ensure the "Admin" role exists
                 if (!await _roleManager.RoleExistsAsync("Admin"))
                 {
                     var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN" });
                     if (!roleResult.Succeeded)
                     {
-                        // Rollback user creation if role creation fails
                         await _userManager.DeleteAsync(user);
                         return BadRequest(new AppResponse<object>().SetErrorResponse("RoleCreation", roleResult.Errors.Select(e => e.Description).ToArray()));
                     }
                 }
 
-                // Add the user to the "Admin" role
                 var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Admin");
                 if (!roleAssignmentResult.Succeeded)
                 {
-                    // Log the error and return a failure response
                     Console.WriteLine($"Error adding role: {string.Join(", ", roleAssignmentResult.Errors.Select(e => e.Description))}");
-                    // Rollback user creation
                     await _userManager.DeleteAsync(user);
                     return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
                 }
@@ -98,6 +94,7 @@ namespace FastWork.Controllers
                 .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
             return BadRequest(new AppResponse<object>().SetErrorResponse(identityErrors));
         }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
@@ -115,7 +112,7 @@ namespace FastWork.Controllers
 
             var user = new User
             {
-                Id = Guid.NewGuid(), // Set the Id property directly
+                Id = Guid.NewGuid(),
                 UserName = model.Email,
                 Email = model.Email,
                 Name = model.FullName,
@@ -127,30 +124,25 @@ namespace FastWork.Controllers
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                // Ensure the "Customer" role exists
                 if (!await _roleManager.RoleExistsAsync("Candidate"))
                 {
                     var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Candidate", NormalizedName = "CANDIDATE" });
                     if (!roleResult.Succeeded)
                     {
-                        // Rollback user creation if role creation fails
                         await _userManager.DeleteAsync(user);
                         return BadRequest(new AppResponse<object>().SetErrorResponse("RoleCreation", roleResult.Errors.Select(e => e.Description).ToArray()));
                     }
                 }
 
-                // Add the user to the "Customer" role
                 var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Candidate");
                 if (!roleAssignmentResult.Succeeded)
                 {
-                    // Log the error and return a failure response
                     Console.WriteLine($"Error adding role: {string.Join(", ", roleAssignmentResult.Errors.Select(e => e.Description))}");
-                    // Rollback user creation
                     await _userManager.DeleteAsync(user);
                     return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
                 }
 
-                Console.WriteLine($"Role 'Customer' assigned to user {user.Email}");
+                Console.WriteLine($"Role 'Candidate' assigned to user {user.Email}");
 
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var confirmationLink = $"{_frontendUrl}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
@@ -172,6 +164,8 @@ namespace FastWork.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
+            var jwtConfig = _configuration.GetSection("Jwt").Get<Dictionary<string, string>>();
+            Console.WriteLine("Jwt Config in Controller: " + (jwtConfig != null ? string.Join(", ", jwtConfig.Select(kvp => $"{kvp.Key}: {kvp.Value}")) : "null"));
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 return Unauthorized(new AppResponse<object>().SetErrorResponse("Credentials", new[] { "Invalid credentials." }));
@@ -185,6 +179,7 @@ namespace FastWork.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault();
             var accessToken = GenerateJwtToken(user, role);
+            Console.WriteLine($"Generated Access Token: {accessToken}"); // Log the token immediately after generation
             var refreshToken = await GenerateRefreshToken(user);
 
             return Ok(new AppResponse<object>().SetSuccessResponse(new { AccessToken = accessToken, RefreshToken = refreshToken }, "Message", "Login successful."));
@@ -269,28 +264,128 @@ namespace FastWork.Controllers
             return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Email confirmed successfully."));
         }
 
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return BadRequest(new AppResponse<object>().SetErrorResponse("User", new[] { "User not found." }));
+            }
+
+            var storedToken = await _userManager.GetAuthenticationTokenAsync(user, "MyApp", "RefreshToken");
+            if (storedToken != model.RefreshToken)
+            {
+                return Unauthorized(new AppResponse<object>().SetErrorResponse("Token", new[] { "Invalid refresh token." }));
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault();
+            var newAccessToken = GenerateJwtToken(user, role);
+            var newRefreshToken = await GenerateRefreshToken(user);
+
+            return Ok(new AppResponse<object>().SetSuccessResponse(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken }, "Message", "Token refreshed successfully."));
+        }
+
+        [Authorize]
+        [HttpGet("user-info")]
+        public IActionResult GetUserInfo()
+        {
+            Console.WriteLine($"Request Processed at {DateTime.Now}: Path={HttpContext.Request.Path}, Method={HttpContext.Request.Method}");
+            Console.WriteLine($"Authorization Header: {Request.Headers["Authorization"]}");
+            Console.WriteLine($"Authentication Type: {User.Identity?.AuthenticationType}");
+            Console.WriteLine($"IsAuthenticated: {User.Identity?.IsAuthenticated}");
+            Console.WriteLine($"All Claims: {string.Join("\n", User.Claims.Select(c => $"{c.Type} = {c.Value}"))}");
+
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return Unauthorized(new
+                {
+                    Message = "Not authenticated",
+                    ReceivedToken = Request.Headers["Authorization"],
+                    AuthenticationType = User.Identity?.AuthenticationType,
+                    Exception = HttpContext.Features.Get<Exception>()?.Message
+                });
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Ok(new { UserId = userId });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("test-auth")]
+        public IActionResult TestAuth()
+        {
+            Console.WriteLine($"Test Auth Processed at {DateTime.Now}: Path={HttpContext.Request.Path}, Method={HttpContext.Request.Method}");
+            return Ok(new { Message = "Test endpoint working", Time = DateTime.Now });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("echo")]
+        public IActionResult Echo()
+        {
+            Console.WriteLine($"Echo Processed at {DateTime.Now}: Path={HttpContext.Request.Path}, Method={HttpContext.Request.Method}, AuthHeader={Request.Headers["Authorization"]}");
+            return Ok(new { Message = "Echo endpoint working", Token = Request.Headers["Authorization"], Time = DateTime.Now });
+        }
+        [AllowAnonymous]
+        [HttpPost("validate-token")]
+        public IActionResult ValidateToken([FromBody] string token)
+        {
+            Console.WriteLine($"Received Token in Body: {token}");
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+            var key = _configuration["Jwt:Key"];
+            Console.WriteLine($"Validation Config - Issuer: {issuer}, Audience: {audience}, Key: {key}");
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                };
+                Console.WriteLine($"Validation Parameters - ValidIssuer: {validationParameters.ValidIssuer}");
+                tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                return Ok(new { Message = "Token is valid", Claims = jwtToken.Claims.Select(c => new { c.Type, c.Value }) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Token validation failed", Error = ex.Message });
+            }
+        }
         private string GenerateJwtToken(User user, string? role)
         {
+            Console.WriteLine("Token Generation Key: " + _configuration["Jwt:Key"]);
+            Console.WriteLine($"Issuer: {_configuration["Jwt:Issuer"]}, Audience: {_configuration["Jwt:Audience"]}");
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, role ?? "Customer")
-            };
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Name),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Role, role ?? "Customer")
+    };
 
             var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddMinutes(120),
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpirationMinutes"])),
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            Console.WriteLine($"Generated Token Payload: {string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"))}");
+            return tokenString;
         }
 
         private async Task<string> GenerateRefreshToken(User user)
@@ -305,5 +400,6 @@ namespace FastWork.Controllers
         public sealed record ResendConfirmationDto(string Email);
         public sealed record ForgotPasswordDto(string Email);
         public sealed record ResetPasswordDto(string Email, string Token, string NewPassword);
+        public sealed record RefreshTokenDto(string UserId, string RefreshToken);
     }
 }
