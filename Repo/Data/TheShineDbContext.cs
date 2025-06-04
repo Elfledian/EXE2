@@ -74,7 +74,7 @@ namespace Repo.Data
         //    => optionsBuilder.UseSqlServer(GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySQL(GetConnectionString());
+            => optionsBuilder.UseSqlServer(GetConnectionString());
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
