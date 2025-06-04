@@ -103,7 +103,7 @@ namespace FastWork.Controllers
         public async Task<IActionResult> UpdateProfile([FromQuery] Guid cvId)
         {
 
-            var user = _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)).Result;
+            var user = _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value).Result;
             if (user == null)
             {
                 return NotFound(new AppResponse<object>().SetErrorResponse("User", new[] { "User not found." }));
