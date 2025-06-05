@@ -1,5 +1,6 @@
 using FastWork.Services.EmailService;
 using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +17,7 @@ using System.Text.Json.Serialization;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using FastWork.Controllers;
+using Hangfire.MySql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,11 +41,22 @@ builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+// Add Hangfire with MySQL storage
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+GlobalConfiguration.Configuration.UseStorage(new MySqlStorage(connectionString, new MySqlStorageOptions
+{
+    TablesPrefix = "Hangfire_",
+    QueuePollInterval = TimeSpan.FromSeconds(15),
+    JobExpirationCheckInterval = TimeSpan.FromHours(1),
+    CountersAggregateInterval = TimeSpan.FromMinutes(5),
+    PrepareSchemaIfNecessary = true
+}));
+
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
-    .UseRecommendedSerializerSettings()
-    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+    .UseRecommendedSerializerSettings());
+
 builder.Services.AddHangfireServer();
 builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
 
