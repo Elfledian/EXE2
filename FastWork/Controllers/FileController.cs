@@ -106,17 +106,14 @@ namespace FastWork.Controllers
             public IFormFile File { get; set; }
         }
 
+        // GET: api/File/download/{id}
         [HttpGet("download/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Produces("application/octet-stream")]
-        public async Task<IActionResult> DownloadFile(Guid id)
+        public async Task<IActionResult> Download(Guid id)
         {
-            var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == id);
+            var file = await _context.Set<File>().FindAsync(id);
             if (file == null)
                 return NotFound();
-
-            return File(file.FileData, file.ContentType ?? MediaTypeNames.Application.Octet, file.FileName);
+            return File(file.FileData, file.ContentType ?? "application/octet-stream", file.FileName);
         }
 
 
