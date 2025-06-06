@@ -11,8 +11,8 @@ using Repo.Data;
 namespace Repo.Migrations
 {
     [DbContext(typeof(TheShineDbContext))]
-    [Migration("20250603183530_AddCvFileToUser")]
-    partial class AddCvFileToUser
+    [Migration("20250606090957_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -224,8 +224,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("CandidateId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("candidate_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("candidate_id");
 
                     b.Property<string>("Education")
                         .HasMaxLength(50)
@@ -481,8 +480,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("InvitationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("invitation_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("invitation_id");
 
                     b.Property<Guid?>("CandidateId")
                         .HasColumnType("char(36)")
@@ -530,8 +528,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("JobId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("job_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("job_id");
 
                     b.Property<string>("Benefits")
                         .HasColumnType("longtext")
@@ -650,8 +647,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("NotificationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("notification_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("notification_id");
 
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -692,8 +688,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("PaymentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("payment_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("payment_id");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(10, 2)")
@@ -733,8 +728,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("RatingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("rating_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("rating_id");
 
                     b.Property<string>("Comment")
                         .HasColumnType("longtext")
@@ -771,8 +765,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("RecruiterId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("recruiter_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("recruiter_id");
 
                     b.Property<string>("CompanyType")
                         .HasMaxLength(50)
@@ -813,8 +806,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("SubscriptionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("subscription_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("subscription_id");
 
                     b.Property<bool?>("CandidatesManagement")
                         .ValueGeneratedOnAdd()
@@ -892,8 +884,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("TagId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("tag_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("tag_id");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -914,8 +905,7 @@ namespace Repo.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -1049,8 +1039,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("VerificationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("verification_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("verification_id");
 
                     b.Property<string>("BlockchainHash")
                         .HasMaxLength(255)
@@ -1086,8 +1075,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("HistoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("history_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("history_id");
 
                     b.Property<Guid?>("CandidateId")
                         .HasColumnType("char(36)")

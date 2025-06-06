@@ -213,7 +213,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "JobId" }, "idx_applications_job_id");
 
-                    b.ToTable("applications", (string)null);
+                    b.ToTable("applications");
                 });
 
             modelBuilder.Entity("Repo.Entities.Candidate", b =>
@@ -221,8 +221,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("CandidateId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("candidate_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("candidate_id");
 
                     b.Property<string>("Education")
                         .HasMaxLength(50)
@@ -270,7 +269,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "UserId" }, "UQ__candidat__B9BE370E1C8D5C72")
                         .IsUnique();
 
-                    b.ToTable("candidates", (string)null);
+                    b.ToTable("candidates");
                 });
 
             modelBuilder.Entity("Repo.Entities.Category", b =>
@@ -296,7 +295,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "Title" }, "idx_categories_title");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("categories");
                 });
 
             modelBuilder.Entity("Repo.Entities.Company", b =>
@@ -339,7 +338,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "RecruiterId" }, "UQ__companie__42ABA25659E2F898")
                         .IsUnique();
 
-                    b.ToTable("companies", (string)null);
+                    b.ToTable("companies");
                 });
 
             modelBuilder.Entity("Repo.Entities.CvDetail", b =>
@@ -431,7 +430,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "CandidateId" }, "idx_cv_details_candidate_id");
 
-                    b.ToTable("cv_details", (string)null);
+                    b.ToTable("cv_details");
                 });
 
             modelBuilder.Entity("Repo.Entities.File", b =>
@@ -470,7 +469,7 @@ namespace Repo.Migrations
                     b.HasKey("FileId")
                         .HasName("PK__files__07D884C68CA1CF9F");
 
-                    b.ToTable("files", (string)null);
+                    b.ToTable("files");
                 });
 
             modelBuilder.Entity("Repo.Entities.Invitation", b =>
@@ -478,8 +477,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("InvitationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("invitation_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("invitation_id");
 
                     b.Property<Guid?>("CandidateId")
                         .HasColumnType("char(36)")
@@ -519,7 +517,7 @@ namespace Repo.Migrations
 
                     b.HasIndex("RecruiterId");
 
-                    b.ToTable("invitations", (string)null);
+                    b.ToTable("invitations");
                 });
 
             modelBuilder.Entity("Repo.Entities.Job", b =>
@@ -527,8 +525,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("JobId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("job_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("job_id");
 
                     b.Property<string>("Benefits")
                         .HasColumnType("longtext")
@@ -639,7 +636,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "RecruiterId" }, "idx_jobs_recruiter_id");
 
-                    b.ToTable("jobs", (string)null);
+                    b.ToTable("jobs");
                 });
 
             modelBuilder.Entity("Repo.Entities.Notification", b =>
@@ -647,8 +644,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("NotificationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("notification_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("notification_id");
 
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -681,7 +677,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "UserId" }, "idx_notifications_user_id");
 
-                    b.ToTable("notifications", (string)null);
+                    b.ToTable("notifications");
                 });
 
             modelBuilder.Entity("Repo.Entities.Payment", b =>
@@ -689,8 +685,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("PaymentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("payment_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("payment_id");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(10, 2)")
@@ -722,7 +717,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "ApplicationId" }, "UQ__payments__3BCBDCF3629EA847")
                         .IsUnique();
 
-                    b.ToTable("payments", (string)null);
+                    b.ToTable("payments");
                 });
 
             modelBuilder.Entity("Repo.Entities.Rating", b =>
@@ -730,8 +725,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("RatingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("rating_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("rating_id");
 
                     b.Property<string>("Comment")
                         .HasColumnType("longtext")
@@ -760,7 +754,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "ReviewerId" }, "idx_ratings_reviewer_id");
 
-                    b.ToTable("ratings", (string)null);
+                    b.ToTable("ratings");
                 });
 
             modelBuilder.Entity("Repo.Entities.Recruiter", b =>
@@ -768,8 +762,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("RecruiterId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("recruiter_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("recruiter_id");
 
                     b.Property<string>("CompanyType")
                         .HasMaxLength(50)
@@ -802,7 +795,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "UserId" }, "UQ__recruite__B9BE370E94EF86F8")
                         .IsUnique();
 
-                    b.ToTable("recruiters", (string)null);
+                    b.ToTable("recruiters");
                 });
 
             modelBuilder.Entity("Repo.Entities.Subscription", b =>
@@ -810,8 +803,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("SubscriptionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("subscription_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("subscription_id");
 
                     b.Property<bool?>("CandidatesManagement")
                         .ValueGeneratedOnAdd()
@@ -881,7 +873,7 @@ namespace Repo.Migrations
 
                     b.HasIndex("RecruiterId");
 
-                    b.ToTable("subscriptions", (string)null);
+                    b.ToTable("subscriptions");
                 });
 
             modelBuilder.Entity("Repo.Entities.Tag", b =>
@@ -889,8 +881,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("TagId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("tag_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("tag_id");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -904,15 +895,14 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "Name" }, "UQ__tags__72E12F1B77600626")
                         .IsUnique();
 
-                    b.ToTable("tags", (string)null);
+                    b.ToTable("tags");
                 });
 
             modelBuilder.Entity("Repo.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -1046,8 +1036,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("VerificationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("verification_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("verification_id");
 
                     b.Property<string>("BlockchainHash")
                         .HasMaxLength(255)
@@ -1075,7 +1064,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "UserId" }, "UQ__verifica__B9BE370EE289CFF9")
                         .IsUnique();
 
-                    b.ToTable("verifications", (string)null);
+                    b.ToTable("verifications");
                 });
 
             modelBuilder.Entity("Repo.Entities.WorkHistory", b =>
@@ -1083,8 +1072,7 @@ namespace Repo.Migrations
                     b.Property<Guid>("HistoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
-                        .HasColumnName("history_id")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnName("history_id");
 
                     b.Property<Guid?>("CandidateId")
                         .HasColumnType("char(36)")
@@ -1110,7 +1098,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "CandidateId" }, "idx_work_history_candidate_id");
 
-                    b.ToTable("work_history", (string)null);
+                    b.ToTable("work_history");
                 });
 
             modelBuilder.Entity("JobTag", b =>

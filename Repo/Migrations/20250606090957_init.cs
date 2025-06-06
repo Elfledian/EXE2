@@ -6,8 +6,10 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace Repo.Migrations
 {
-    public partial class inti : Migration
+    /// <inheritdoc />
+    public partial class init : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -29,45 +31,10 @@ namespace Repo.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    role = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
-                    name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    phone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true),
-                    google_id = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
-                    remember_me = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: false),
-                    terms_agreed = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: false),
-                    location = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, defaultValue: "Ho Chi Minh City"),
-                    created_at = table.Column<DateTime>(type: "datetime", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "longtext", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "longtext", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetime", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__users__B9BE370FA57EB208", x => x.Id);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "categories",
                 columns: table => new
                 {
-                    category_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    category_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     sub_items = table.Column<string>(type: "longtext", nullable: false)
                 },
@@ -78,10 +45,27 @@ namespace Repo.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "files",
+                columns: table => new
+                {
+                    file_id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    file_name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    file_type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
+                    file_data = table.Column<byte[]>(type: "longblob", nullable: true),
+                    content_type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    upload_date = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__files__07D884C68CA1CF9F", x => x.file_id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "tags",
                 columns: table => new
                 {
-                    tag_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    tag_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -109,6 +93,47 @@ namespace Repo.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    role = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
+                    name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    phone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true),
+                    google_id = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    remember_me = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: false),
+                    terms_agreed = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: false),
+                    location = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, defaultValue: "Ho Chi Minh City"),
+                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    cvfileid = table.Column<Guid>(type: "char(36)", nullable: true),
+                    UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "longtext", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "longtext", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetime", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__users__B9BE370FA57EB208", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_files_cvfileid",
+                        column: x => x.cvfileid,
+                        principalTable: "files",
+                        principalColumn: "file_id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -205,7 +230,7 @@ namespace Repo.Migrations
                 name: "candidates",
                 columns: table => new
                 {
-                    candidate_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    candidate_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Chua nh?n vi?c"),
                     gender = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -227,10 +252,39 @@ namespace Repo.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "companies",
+                columns: table => new
+                {
+                    company_id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
+                    company_name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    website = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
+                    logo_file_id = table.Column<Guid>(type: "char(36)", nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__companie__3E267235299690E3", x => x.company_id);
+                    table.ForeignKey(
+                        name: "FK__companies__recru__52593CB8",
+                        column: x => x.recruiter_id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_companies_files",
+                        column: x => x.logo_file_id,
+                        principalTable: "files",
+                        principalColumn: "file_id",
+                        onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "notifications",
                 columns: table => new
                 {
-                    notification_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    notification_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     message = table.Column<string>(type: "longtext", nullable: false),
                     type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -253,7 +307,7 @@ namespace Repo.Migrations
                 name: "ratings",
                 columns: table => new
                 {
-                    rating_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    rating_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     reviewer_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     rating = table.Column<int>(type: "int", nullable: true),
                     comment = table.Column<string>(type: "longtext", nullable: true),
@@ -275,7 +329,7 @@ namespace Repo.Migrations
                 name: "recruiters",
                 columns: table => new
                 {
-                    recruiter_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    recruiter_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     company_type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     scale = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -298,7 +352,7 @@ namespace Repo.Migrations
                 name: "verifications",
                 columns: table => new
                 {
-                    verification_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    verification_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     user_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     blockchain_hash = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Pending"),
@@ -320,7 +374,7 @@ namespace Repo.Migrations
                 name: "cv_details",
                 columns: table => new
                 {
-                    cv_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    cv_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     full_name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     contact_email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
@@ -351,34 +405,10 @@ namespace Repo.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "files",
-                columns: table => new
-                {
-                    file_id = table.Column<Guid>(type: "char(36)", nullable: false ),
-                    candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
-                    file_name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
-                    file_type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
-                    file_data = table.Column<byte[]>(type: "longblob", nullable: true),
-                    content_type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
-                    upload_date = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__files__07D884C68CA1CF9F", x => x.file_id);
-                    table.ForeignKey(
-                        name: "FK__files__candidate__2BFE89A6",
-                        column: x => x.candidate_id,
-                        principalTable: "candidates",
-                        principalColumn: "candidate_id",
-                        onDelete: ReferentialAction.SetNull);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "work_history",
                 columns: table => new
                 {
-                    history_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    history_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     date = table.Column<DateOnly>(type: "date", nullable: false),
                     content = table.Column<string>(type: "longtext", nullable: false),
@@ -400,7 +430,7 @@ namespace Repo.Migrations
                 name: "subscriptions",
                 columns: table => new
                 {
-                    subscription_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    subscription_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     plan = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     subtitle = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
@@ -428,39 +458,10 @@ namespace Repo.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "companies",
-                columns: table => new
-                {
-                    company_id = table.Column<Guid>(type: "char(36)", nullable: false ),
-                    recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
-                    company_name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    website = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
-                    logo_file_id = table.Column<Guid>(type: "char(36)", nullable: true),
-                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__companie__3E267235299690E3", x => x.company_id);
-                    table.ForeignKey(
-                        name: "FK__companies__recru__52593CB8",
-                        column: x => x.recruiter_id,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_companies_files",
-                        column: x => x.logo_file_id,
-                        principalTable: "files",
-                        principalColumn: "file_id",
-                        onDelete: ReferentialAction.SetNull);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "jobs",
                 columns: table => new
                 {
-                    job_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    job_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     company_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     subscription_id = table.Column<Guid>(type: "char(36)", nullable: true),
@@ -514,7 +515,7 @@ namespace Repo.Migrations
                 name: "applications",
                 columns: table => new
                 {
-                    application_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    application_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     job_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Applied"),
@@ -544,7 +545,7 @@ namespace Repo.Migrations
                 name: "invitations",
                 columns: table => new
                 {
-                    invitation_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    invitation_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     recruiter_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     candidate_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     job_id = table.Column<Guid>(type: "char(36)", nullable: true),
@@ -603,7 +604,7 @@ namespace Repo.Migrations
                 name: "payments",
                 columns: table => new
                 {
-                    payment_id = table.Column<Guid>(type: "char(36)", nullable: false ),
+                    payment_id = table.Column<Guid>(type: "char(36)", nullable: false),
                     application_id = table.Column<Guid>(type: "char(36)", nullable: true),
                     amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValue: "Pending"),
@@ -662,6 +663,11 @@ namespace Repo.Migrations
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_cvfileid",
+                table: "AspNetUsers",
+                column: "cvfileid");
 
             migrationBuilder.CreateIndex(
                 name: "UQ__users__AB6E6164023178F8",
@@ -856,6 +862,9 @@ namespace Repo.Migrations
                 name: "applications");
 
             migrationBuilder.DropTable(
+                name: "candidates");
+
+            migrationBuilder.DropTable(
                 name: "jobs");
 
             migrationBuilder.DropTable(
@@ -868,16 +877,13 @@ namespace Repo.Migrations
                 name: "subscriptions");
 
             migrationBuilder.DropTable(
-                name: "files");
-
-            migrationBuilder.DropTable(
                 name: "recruiters");
 
             migrationBuilder.DropTable(
-                name: "candidates");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "files");
         }
     }
 }
