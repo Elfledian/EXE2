@@ -37,7 +37,7 @@ namespace FastWork.Controllers
             _roleManager = roleManager;
             _configuration = configuration;
             _emailSenderService = emailSenderService;
-            _frontendUrl = configuration["Url:Frontend"] ?? "https://localhost:5044";
+            _frontendUrl = configuration["Url:Frontend"] ?? "https://theshine.nhannguyen.site";
             _theShineDbContext = theShineDbContext;
         }
 
