@@ -10,6 +10,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Repo.Data;
 
 namespace FastWork.Controllers
 {
@@ -22,18 +24,21 @@ namespace FastWork.Controllers
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailSenderService;
         private readonly string _frontendUrl;
+        private readonly TheShineDbContext _theShineDbContext;
 
         public UserController(
             UserManager<User> userManager,
             RoleManager<IdentityRole<Guid>> roleManager,
             IConfiguration configuration,
-            IEmailService emailSenderService)
+            IEmailService emailSenderService, 
+            TheShineDbContext theShineDbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _emailSenderService = emailSenderService;
             _frontendUrl = configuration["Url:Frontend"] ?? "https://localhost:5044";
+            _theShineDbContext = theShineDbContext;
         }
 
         [HttpPost("admin")]
@@ -360,6 +365,43 @@ namespace FastWork.Controllers
                 return BadRequest(new { Message = "Token validation failed", Error = ex.Message });
             }
         }
+        [HttpGet("userandidpaging")]
+        public async Task<IActionResult> GetUserAndIdWithPaging(int pageNumber = 1, int pageSize = 10)
+        {
+            var users = _userManager.Users.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            var totalUsers = await _userManager.Users.CountAsync<User>();
+            return Ok(new
+            {
+                Users = users.Select(u => new { u.Id, u.UserName, u.Email, u.Name, u.Phone }),
+                TotalCount = totalUsers,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            });
+        }
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeleteUserById(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+                return NotFound(new { Message = "User not found" });
+
+            var name = user.UserName ?? "Unknown User";
+            // Remove user roles first
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Any())
+            {
+                var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, roles);
+                if (!removeRolesResult.Succeeded)
+                    return BadRequest(new { Message = "Cannot delete connection with role", Errors = removeRolesResult.Errors });
+            }
+
+            // Delete the user
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+                return BadRequest(new { Message = $"Failed to delete user id {id} name {name}", Errors = result.Errors });
+
+            return Ok(new { Message = $"User id {id} name {name} deleted successfully!" });
+        }
         private string GenerateJwtToken(User user, string? role)
         {
             Console.WriteLine("Token Generation Key: " + _configuration["Jwt:Key"]);
@@ -387,7 +429,6 @@ namespace FastWork.Controllers
             Console.WriteLine($"Generated Token Payload: {string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"))}");
             return tokenString;
         }
-
         private async Task<string> GenerateRefreshToken(User user)
         {
             var refreshToken = Guid.NewGuid().ToString();
