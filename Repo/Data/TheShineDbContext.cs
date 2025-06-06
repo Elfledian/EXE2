@@ -145,7 +145,13 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.FileId).HasName("PK__files__07D884C68CA1CF9F");
 
+
                 entity.Property(e => e.UploadDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.FileData)
+                    .IsRequired()
+                    .HasColumnType("LONGBLOB")
+                    .HasColumnName("file_data");
 
                 //entity.HasOne(d => d.Candidate).WithMany(p => p.Files)
                 //    .OnDelete(DeleteBehavior.SetNull)

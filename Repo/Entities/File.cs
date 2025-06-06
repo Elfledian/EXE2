@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repo.Entities;
@@ -27,8 +28,10 @@ public partial class File
     [StringLength(50)]
     public string FileType { get; set; }
 
-    [Column("file_data")]
+    [Column("file_data", TypeName = "LONGBLOB")]
+    [Required]
     public byte[] FileData { get; set; }
+
 
     [Column("content_type")]
     [StringLength(100)]
@@ -40,10 +43,10 @@ public partial class File
     //[ForeignKey("CandidateId")]
     //[InverseProperty("Files")]
     //public virtual Candidate Candidate { get; set; }
-
+    [JsonIgnore]    
     [InverseProperty("LogoFile")]
     public virtual ICollection<Company> Companies { get; set; } = new List<Company>();
-
+    [JsonIgnore]
     [InverseProperty("CvFile")]
     public virtual ICollection<User> UsersWithCvFile { get; set; } = new List<User>();
 }

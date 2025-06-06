@@ -1,22 +1,24 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Text.Json.Serialization;
+using FastWork.Controllers;
 using FastWork.Services.EmailService;
 using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Repo;
 using Repo.Data;
 using Repo.Entities;
 using Repo.Repositories;
-using Repo;
-using Service.DTO;
-using Service.Services.EmailService;
-using Service.Services;
+using Repo.Supports;
 using Service;
-using System.Text.Json.Serialization;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
-using FastWork.Controllers;
-using Hangfire.MySql;
+using Service.DTO;
+using Service.Services;
+using Service.Services.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -153,6 +155,8 @@ builder.Services.AddSwaggerGen(option =>
             Array.Empty<string>()
         }
     });
+    option.SwaggerDoc("v1", new() { Title = "Your API", Version = "v1" });
+    option.OperationFilter<FileResponseOperationFilter>(); // <-- Add this line
 });
 var app = builder.Build();
 

@@ -1,15 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
-using Repo.Entities;
 using System;
 using System.IO;
+using System.Net.Mime;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Repo.Data;
-using File = Repo.Entities.File;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
+using Repo.Data;
+using Repo.Entities;
 using Service.Helper;
-using System.Security.Claims;
+using File = Repo.Entities.File;
 
 namespace FastWork.Controllers
 {
@@ -26,44 +28,98 @@ namespace FastWork.Controllers
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
-        // POST: api/File/upload
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public async Task<IActionResult> UploadFileAdoAsync(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
+                return BadRequest("No file uploaded");
 
-            using var ms = new MemoryStream();
-            await file.CopyToAsync(ms);
-
-            var entity = new File
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
             {
-                FileId = Guid.NewGuid(),
-                FileName = file.FileName,
-                FileType = Path.GetExtension(file.FileName),
-                FileData = ms.ToArray(),
-                ContentType = file.ContentType,
-                UploadDate = DateTime.UtcNow
-            };
+                await file.CopyToAsync(ms);
+                fileBytes = ms.ToArray();
+            }
 
-            _context.Set<File>().Add(entity);
-            await _context.SaveChangesAsync();
+            var fileId = Guid.NewGuid();
+            var fileName = file.FileName;
+            var contentType = file.ContentType;
+            var uploadDate = DateTime.UtcNow;
 
-            var downloadUrl = Url.Action(nameof(Download), "File", new { id = entity.FileId }, Request.Scheme);
+            var connectionString = _context.Database.GetDbConnection().ConnectionString;
 
-            return Ok(new { link = downloadUrl , id = entity.FileId});
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            var cmdText = @"
+        INSERT INTO files (file_id, file_name, file_type, content_type, file_data, upload_date)
+        VALUES (@fileId, @fileName, @fileType, @contentType, @fileData, @uploadDate)";
+
+            await using var cmd = new MySqlCommand(cmdText, connection);
+            cmd.Parameters.AddWithValue("@fileId", fileId.ToString());
+            cmd.Parameters.AddWithValue("@fileName", fileName);
+            cmd.Parameters.AddWithValue("@fileType", contentType);
+            cmd.Parameters.AddWithValue("@contentType", contentType);
+            cmd.Parameters.Add("@fileData", MySqlDbType.LongBlob).Value = fileBytes;
+            cmd.Parameters.AddWithValue("@uploadDate", uploadDate);
+
+            var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+            if (rowsAffected == 1)
+                return Ok(new { id = fileId });
+            else
+                return StatusCode(500, "Error inserting file");
         }
 
-        // GET: api/File/download/{id}
-        [HttpGet("download/{id}")]
-        public async Task<IActionResult> Download(Guid id)
+        //[HttpPost("uploadaaaa")]
+        //public async Task<IActionResult> UploadFileAsyncaa([FromForm] FileUploadModel filee)
+        //{
+        //    var file = filee.File;
+        //    if (file == null || file.Length == 0)
+        //        return BadRequest("No file uploaded");
+
+        //    byte[] fileBytes;
+        //    using (var ms = new MemoryStream())
+        //    {
+        //        await file.CopyToAsync(ms);
+        //        fileBytes = ms.ToArray();
+        //    }
+
+        //    var fileEntity = new File
+        //    {
+        //        FileId = Guid.NewGuid(),
+        //        FileName = file.FileName,
+        //        FileType = file.ContentType,
+        //        ContentType = file.ContentType,
+        //        FileData = fileBytes,
+        //        UploadDate = DateTime.UtcNow
+        //    };
+
+        //    _context.Files.Add(fileEntity);
+        //    await _context.SaveChangesAsync();
+
+        //    return Ok(new { id = fileEntity.FileId });
+        //}
+
+        public class FileUploadModel
         {
-            var file = await _context.Set<File>().FindAsync(id);
+            public IFormFile File { get; set; }
+        }
+
+        [HttpGet("download/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/octet-stream")]
+        public async Task<IActionResult> DownloadFile(Guid id)
+        {
+            var file = await _context.Files.FirstOrDefaultAsync(f => f.FileId == id);
             if (file == null)
                 return NotFound();
 
-            return File(file.FileData, file.ContentType ?? "application/octet-stream", file.FileName);
+            return File(file.FileData, file.ContentType ?? MediaTypeNames.Application.Octet, file.FileName);
         }
+
+
 
         [HttpGet]
         public ActionResult GetFiles()
