@@ -14,7 +14,6 @@ using Repo;
 using Repo.Data;
 using Repo.Entities;
 using Repo.Repositories;
-using Repo.Supports;
 using Service;
 using Service.DTO;
 using Service.Services;
@@ -156,7 +155,6 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
     option.SwaggerDoc("v1", new() { Title = "Your API", Version = "v1" });
-    option.OperationFilter<FileResponseOperationFilter>(); // <-- Add this line
 });
 var app = builder.Build();
 
