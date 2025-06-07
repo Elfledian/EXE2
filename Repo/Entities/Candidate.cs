@@ -47,8 +47,8 @@ public partial class Candidate
     [InverseProperty("Candidate")]
     public virtual ICollection<CvDetail> CvDetails { get; set; } = new List<CvDetail>();
 
-    [InverseProperty("Candidate")]
-    public virtual ICollection<File> Files { get; set; } = new List<File>();
+    //[InverseProperty("Candidate")]
+    //public virtual ICollection<File> Files { get; set; } = new List<File>();
 
     [InverseProperty("Candidate")]
     public virtual ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();

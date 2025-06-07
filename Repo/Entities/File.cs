@@ -9,15 +9,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Repo.Entities;
 
 [Table("files")]
-[Index("CandidateId", Name = "idx_files_candidate_id")]
 public partial class File
 {
     [Key]
     [Column("file_id")]
     public Guid FileId { get; set; }
 
-    [Column("candidate_id")]
-    public Guid? CandidateId { get; set; }
+    //[Column("candidate_id")]
+    //public Guid? CandidateId { get; set; }
 
     [Required]
     [Column("file_name")]
@@ -38,10 +37,13 @@ public partial class File
     [Column("upload_date", TypeName = "datetime")]
     public DateTime? UploadDate { get; set; }
 
-    [ForeignKey("CandidateId")]
-    [InverseProperty("Files")]
-    public virtual Candidate Candidate { get; set; }
+    //[ForeignKey("CandidateId")]
+    //[InverseProperty("Files")]
+    //public virtual Candidate Candidate { get; set; }
 
     [InverseProperty("LogoFile")]
     public virtual ICollection<Company> Companies { get; set; } = new List<Company>();
+
+    [InverseProperty("CvFile")]
+    public virtual ICollection<User> UsersWithCvFile { get; set; } = new List<User>();
 }

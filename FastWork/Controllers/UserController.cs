@@ -33,7 +33,7 @@ namespace FastWork.Controllers
             _roleManager = roleManager;
             _configuration = configuration;
             _emailSenderService = emailSenderService;
-            _frontendUrl = configuration["Url:Frontend"] ?? "https://youtube.com";
+            _frontendUrl = configuration["Url:Frontend"] ?? "https://localhost:5044";
         }
 
         [HttpPost("admin")]

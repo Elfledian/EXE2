@@ -28,7 +28,6 @@ public partial class User : IdentityUser<Guid>
     [StringLength(20)]
     public string Phone { get; set; }
 
-
     [Column("google_id")]
     [StringLength(100)]
     public string GoogleId { get; set; }
@@ -48,6 +47,15 @@ public partial class User : IdentityUser<Guid>
 
     [Column("updated_at", TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
+
+    // ✅ NEW FIELD: Foreign key to File
+    [Column("cvfileid")]
+    public Guid? CvFileId { get; set; }
+
+    // ✅ NEW NAVIGATION PROPERTY
+    [ForeignKey("CvFileId")]
+    [InverseProperty("UsersWithCvFile")]
+    public virtual File CvFile { get; set; }
 
     [InverseProperty("User")]
     public virtual Candidate Candidate { get; set; }

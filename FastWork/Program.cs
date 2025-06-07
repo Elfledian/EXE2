@@ -17,10 +17,18 @@ using System.Text.Json.Serialization;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using FastWork.Controllers;
-using Hangfire.MySql;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowLocalhost5173",
+//        policy =>
+//        {
+//            policy.WithOrigins("https://theshine.nhannguyen.site")
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod();
+//        });
+//});
 // Add logging first to capture all events
 builder.Services.AddLogging(logging =>
 {
@@ -41,22 +49,11 @@ builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
-// Add Hangfire with MySQL storage
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-GlobalConfiguration.Configuration.UseStorage(new MySqlStorage(connectionString, new MySqlStorageOptions
-{
-    TablesPrefix = "Hangfire_",
-    QueuePollInterval = TimeSpan.FromSeconds(15),
-    JobExpirationCheckInterval = TimeSpan.FromHours(1),
-    CountersAggregateInterval = TimeSpan.FromMinutes(5),
-    PrepareSchemaIfNecessary = true
-}));
-
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
-    .UseRecommendedSerializerSettings());
-
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddHangfireServer();
 builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
 
@@ -206,7 +203,7 @@ app.Map("/{**catchAll}", (HttpContext context) =>
 });
 
 app.MapControllers();
-
+app.UseCors("AllowLocalhost5173");
 // Add a health check endpoint to verify routing
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Time = DateTime.Now }));
 

@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Repo.Data;
 using File = Repo.Entities.File;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Service.Helper;
+using System.Security.Claims;
 
 namespace FastWork.Controllers
 {
@@ -14,10 +18,12 @@ namespace FastWork.Controllers
     public class FileController : ControllerBase
     {
         private readonly TheShineDbContext _context; // Replace with your actual DbContext type
+        private readonly UserManager<User> _userManager; // Assuming you have a User entity and UserManager
 
-        public FileController(TheShineDbContext context)
+        public FileController(TheShineDbContext context, UserManager<User> userManager)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         // POST: api/File/upload
@@ -58,5 +64,67 @@ namespace FastWork.Controllers
 
             return File(file.FileData, file.ContentType ?? "application/octet-stream", file.FileName);
         }
+
+        [HttpGet]
+        public ActionResult GetFiles()
+        {
+            var files = _context.Set<File>().ToList();
+            return Ok(files);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetFileById(Guid id)
+        {
+            var file = await _context.Set<File>().FindAsync(id);
+            if (file == null)
+                return NotFound();
+            return Ok(file);
+        }
+        [Authorize]
+        [HttpGet("user-info")]
+        public IActionResult GetUserInfo()
+        {
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return Unauthorized(new
+                {
+                    Message = "Not authenticated",
+                    ReceivedToken = Request.Headers["Authorization"],
+                    AuthenticationType = User.Identity?.AuthenticationType,
+                    Exception = HttpContext.Features.Get<Exception>()?.Message
+                });
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Ok(new { UserId = userId });
+        }
+
+        [Authorize]
+        [HttpPut("add-cv-file")]
+        public async Task<IActionResult> UpdateProfile([FromQuery] Guid cvId)
+        {
+
+            var user = _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value).Result;
+            if (user == null)
+            {
+                return NotFound(new AppResponse<object>().SetErrorResponse("User", new[] { "User not found." }));
+            }
+
+            user.CvFileId = cvId;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToArray();
+                return BadRequest(new AppResponse<object>().SetErrorResponse("UpdateErrors", errors));
+            }
+            return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "CV file updated successfully."));
+        }
+        [Authorize]
+        [HttpGet("debug-claims")]
+        public IActionResult DebugClaims()
+        {
+            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            return Ok(claims);
+        }
+
     }
 }

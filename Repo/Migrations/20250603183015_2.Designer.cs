@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repo.Data;
 
@@ -10,9 +11,11 @@ using Repo.Data;
 namespace Repo.Migrations
 {
     [DbContext(typeof(TheShineDbContext))]
-    partial class TheShineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250603183015_2")]
+    partial class _2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,7 +216,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "JobId" }, "idx_applications_job_id");
 
-                    b.ToTable("applications", (string)null);
+                    b.ToTable("applications");
                 });
 
             modelBuilder.Entity("Repo.Entities.Candidate", b =>
@@ -270,7 +273,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "UserId" }, "UQ__candidat__B9BE370E1C8D5C72")
                         .IsUnique();
 
-                    b.ToTable("candidates", (string)null);
+                    b.ToTable("candidates");
                 });
 
             modelBuilder.Entity("Repo.Entities.Category", b =>
@@ -296,7 +299,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "Title" }, "idx_categories_title");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("categories");
                 });
 
             modelBuilder.Entity("Repo.Entities.Company", b =>
@@ -339,7 +342,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "RecruiterId" }, "UQ__companie__42ABA25659E2F898")
                         .IsUnique();
 
-                    b.ToTable("companies", (string)null);
+                    b.ToTable("companies");
                 });
 
             modelBuilder.Entity("Repo.Entities.CvDetail", b =>
@@ -431,7 +434,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "CandidateId" }, "idx_cv_details_candidate_id");
 
-                    b.ToTable("cv_details", (string)null);
+                    b.ToTable("cv_details");
                 });
 
             modelBuilder.Entity("Repo.Entities.File", b =>
@@ -470,7 +473,7 @@ namespace Repo.Migrations
                     b.HasKey("FileId")
                         .HasName("PK__files__07D884C68CA1CF9F");
 
-                    b.ToTable("files", (string)null);
+                    b.ToTable("files");
                 });
 
             modelBuilder.Entity("Repo.Entities.Invitation", b =>
@@ -519,7 +522,7 @@ namespace Repo.Migrations
 
                     b.HasIndex("RecruiterId");
 
-                    b.ToTable("invitations", (string)null);
+                    b.ToTable("invitations");
                 });
 
             modelBuilder.Entity("Repo.Entities.Job", b =>
@@ -639,7 +642,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "RecruiterId" }, "idx_jobs_recruiter_id");
 
-                    b.ToTable("jobs", (string)null);
+                    b.ToTable("jobs");
                 });
 
             modelBuilder.Entity("Repo.Entities.Notification", b =>
@@ -681,7 +684,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "UserId" }, "idx_notifications_user_id");
 
-                    b.ToTable("notifications", (string)null);
+                    b.ToTable("notifications");
                 });
 
             modelBuilder.Entity("Repo.Entities.Payment", b =>
@@ -722,7 +725,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "ApplicationId" }, "UQ__payments__3BCBDCF3629EA847")
                         .IsUnique();
 
-                    b.ToTable("payments", (string)null);
+                    b.ToTable("payments");
                 });
 
             modelBuilder.Entity("Repo.Entities.Rating", b =>
@@ -760,7 +763,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "ReviewerId" }, "idx_ratings_reviewer_id");
 
-                    b.ToTable("ratings", (string)null);
+                    b.ToTable("ratings");
                 });
 
             modelBuilder.Entity("Repo.Entities.Recruiter", b =>
@@ -802,7 +805,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "UserId" }, "UQ__recruite__B9BE370E94EF86F8")
                         .IsUnique();
 
-                    b.ToTable("recruiters", (string)null);
+                    b.ToTable("recruiters");
                 });
 
             modelBuilder.Entity("Repo.Entities.Subscription", b =>
@@ -881,7 +884,7 @@ namespace Repo.Migrations
 
                     b.HasIndex("RecruiterId");
 
-                    b.ToTable("subscriptions", (string)null);
+                    b.ToTable("subscriptions");
                 });
 
             modelBuilder.Entity("Repo.Entities.Tag", b =>
@@ -904,7 +907,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "Name" }, "UQ__tags__72E12F1B77600626")
                         .IsUnique();
 
-                    b.ToTable("tags", (string)null);
+                    b.ToTable("tags");
                 });
 
             modelBuilder.Entity("Repo.Entities.User", b =>
@@ -926,10 +929,6 @@ namespace Repo.Migrations
                         .HasColumnType("datetime")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<Guid?>("CvFileId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("cvfileid");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -1020,8 +1019,6 @@ namespace Repo.Migrations
                     b.HasKey("Id")
                         .HasName("PK__users__B9BE370FA57EB208");
 
-                    b.HasIndex("CvFileId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -1075,7 +1072,7 @@ namespace Repo.Migrations
                     b.HasIndex(new[] { "UserId" }, "UQ__verifica__B9BE370EE289CFF9")
                         .IsUnique();
 
-                    b.ToTable("verifications", (string)null);
+                    b.ToTable("verifications");
                 });
 
             modelBuilder.Entity("Repo.Entities.WorkHistory", b =>
@@ -1110,7 +1107,7 @@ namespace Repo.Migrations
 
                     b.HasIndex(new[] { "CandidateId" }, "idx_work_history_candidate_id");
 
-                    b.ToTable("work_history", (string)null);
+                    b.ToTable("work_history");
                 });
 
             modelBuilder.Entity("JobTag", b =>
@@ -1352,15 +1349,6 @@ namespace Repo.Migrations
                     b.Navigation("Recruiter");
                 });
 
-            modelBuilder.Entity("Repo.Entities.User", b =>
-                {
-                    b.HasOne("Repo.Entities.File", "CvFile")
-                        .WithMany("UsersWithCvFile")
-                        .HasForeignKey("CvFileId");
-
-                    b.Navigation("CvFile");
-                });
-
             modelBuilder.Entity("Repo.Entities.Verification", b =>
                 {
                     b.HasOne("Repo.Entities.User", "User")
@@ -1412,8 +1400,6 @@ namespace Repo.Migrations
             modelBuilder.Entity("Repo.Entities.File", b =>
                 {
                     b.Navigation("Companies");
-
-                    b.Navigation("UsersWithCvFile");
                 });
 
             modelBuilder.Entity("Repo.Entities.Job", b =>
