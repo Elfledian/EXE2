@@ -15,6 +15,11 @@ namespace Repo.GenericRepository
     {
         private readonly TheShineDbContext _context;
 
+        public GenericRepository()
+        {
+            _context = new TheShineDbContext();
+        }
+
         public GenericRepository(TheShineDbContext context)
         {
             _context = context;

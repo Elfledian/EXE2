@@ -1,5 +1,6 @@
 using FastWork.Services.EmailService;
 using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -16,18 +17,19 @@ using System.Text.Json.Serialization;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using FastWork.Controllers;
+using Service.Services.JobService;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowLocalhost5173",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowLocalhost5173",
+//        policy =>
+//        {
+//            policy.WithOrigins("https://theshine.nhannguyen.site")
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod();
+//        });
+//});
 // Add logging first to capture all events
 builder.Services.AddLogging(logging =>
 {
@@ -46,6 +48,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
+builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddHangfire(config => config
