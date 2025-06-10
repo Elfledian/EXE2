@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace Repo.Repositories
 {
-    public class JobRepo : GenericRepository<Job>
+    public class CategoryRepo :GenericRepository<Category>
     {
-        public JobRepo(TheShineDbContext context) : base(context)
+        public CategoryRepo(TheShineDbContext context) : base(context)
         {
         }
     }
+
 }

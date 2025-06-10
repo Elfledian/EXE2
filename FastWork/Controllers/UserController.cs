@@ -10,6 +10,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using Repo.Data;
 
 namespace FastWork.Controllers
 {
@@ -21,19 +24,22 @@ namespace FastWork.Controllers
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailSenderService;
+        private readonly TheShineDbContext _context;
         private readonly string _frontendUrl;
 
         public UserController(
             UserManager<User> userManager,
             RoleManager<IdentityRole<Guid>> roleManager,
             IConfiguration configuration,
-            IEmailService emailSenderService)
+            IEmailService emailSenderService,
+            TheShineDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _emailSenderService = emailSenderService;
             _frontendUrl = configuration["Url:Frontend"] ?? "https://localhost:5044";
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [HttpPost("admin")]
@@ -394,6 +400,94 @@ namespace FastWork.Controllers
             await _userManager.SetAuthenticationTokenAsync(user, "MyApp", "RefreshToken", refreshToken);
             return refreshToken;
         }
+        [HttpPost("register-recruiter")]
+        public async Task<IActionResult> RegisterRecruiter([FromBody] RecruiterRegisterDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToArray();
+                return BadRequest(new AppResponse<object>().SetErrorResponse("ModelState", errors));
+            }
+
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                return BadRequest(new AppResponse<object>().SetErrorResponse("Email", new[] { "Email is already registered." }));
+            }
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = model.Email,
+                Email = model.Email,
+                Name = model.FullName,
+                Phone = model.PhoneNumber,
+                CreatedAt = DateTime.UtcNow,
+                EmailConfirmed = false
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                try
+                {
+                    // Create Recruiter role if it doesn't exist
+                    if (!await _roleManager.RoleExistsAsync("Recruiter"))
+                    {
+                        var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Recruiter", NormalizedName = "RECRUITER" };
+                        var roleResult = await _roleManager.CreateAsync(role);
+                        if (!roleResult.Succeeded)
+                        {
+                            await _userManager.DeleteAsync(user);
+                            return BadRequest(new AppResponse<object>().SetErrorResponse("RoleCreation", roleResult.Errors.Select(e => e.Description).ToArray()));
+                        }
+                    }
+
+                    // Assign the role to the recruiter
+                    var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Recruiter");
+                    if (!roleAssignmentResult.Succeeded)
+                    {
+                        await _userManager.DeleteAsync(user);
+                        return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
+                    }
+
+                    // Create Recruiter entity
+                    var recruiter = new Recruiter
+                    {
+                        RecruiterId = Guid.NewGuid(),
+                        UserId = user.Id,
+                        CompanyType = model.CompanyType,
+                        Scale = model.Scale,
+                        ContactPhone = model.ContactPhone,
+                        Verified = false
+                    };
+
+                    await _context.Recruiters.AddAsync(recruiter);
+                    await _context.SaveChangesAsync();
+
+                    // Send email confirmation
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmationLink = $"{_frontendUrl}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+                    var emailBody = EmailBodyTemplate.GetRegistrationConfirmationEmail(user.Name, confirmationLink);
+
+                    _emailSenderService.SendEmail(user.Email, "Confirm Your Email", emailBody);
+
+                    return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Recruiter registration successful. Check your email to confirm your account."));
+                }
+                catch (Exception ex)
+                {
+                    // Rollback user creation if any error occurs
+                    await _userManager.DeleteAsync(user);
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AppResponse<object>().SetErrorResponse("ServerError", new[] { $"An error occurred: {ex.Message}" }));
+                }
+            }
+
+            var identityErrors = result.Errors
+                .Where(e => e.Code != "DuplicateUserName")
+                .GroupBy(e => e.Code)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
+            return BadRequest(new AppResponse<object>().SetErrorResponse(identityErrors));
+        }
 
         public sealed record RegisterDto(string Email, string FullName, string PhoneNumber, string Password);
         public sealed record LoginDto(string Email, string Password);
@@ -401,5 +495,29 @@ namespace FastWork.Controllers
         public sealed record ForgotPasswordDto(string Email);
         public sealed record ResetPasswordDto(string Email, string Token, string NewPassword);
         public sealed record RefreshTokenDto(string UserId, string RefreshToken);
+        public sealed record RecruiterRegisterDto
+        {
+            [Required]
+            [EmailAddress]
+            public string Email { get; init; }
+            [Required]
+            public string FullName { get; init; }
+            [Required]
+            [Phone]
+            public string PhoneNumber { get; init; }
+            [Required]
+            [MinLength(6)]
+            public string Password { get; init; }
+            [Required]
+            [StringLength(50)]
+            public string CompanyType { get; init; }
+            [Required]
+            [StringLength(50)]
+            public string Scale { get; init; }
+            [Required]
+            [Phone]
+            public string ContactPhone { get; init; }
+        }
+
     }
 }

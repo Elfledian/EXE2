@@ -18,6 +18,8 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using FastWork.Controllers;
 using Service.Services.JobService;
+using Service.Services.RecruiterService;
+using Service.Services.CategoryService;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddCors(options =>
@@ -48,7 +50,12 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
+builder.Services.AddScoped<JobRepo>();
 builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<RecruiterRepo>();
+builder.Services.AddScoped<CategoryRepo>();
+builder.Services.AddScoped<IRecruiterService, RecruiterService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddHangfire(config => config
