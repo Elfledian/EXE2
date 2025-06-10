@@ -25,7 +25,7 @@ public partial class File
     public string FileName { get; set; }
 
     [Column("file_type")]
-    [StringLength(50)]
+    [StringLength(200)]
     public string FileType { get; set; }
 
     [Column("file_data", TypeName = "LONGBLOB")]

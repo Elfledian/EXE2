@@ -17,6 +17,7 @@ using Repo.Repositories;
 using Service;
 using Service.DTO;
 using Service.Services;
+using Service.Services.ApplicationsService;
 using Service.Services.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +52,11 @@ builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddScoped<IApplicationServices, ApplicationServices>();
+
+
+
+
 // Add Hangfire with MySQL storage
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 GlobalConfiguration.Configuration.UseStorage(new MySqlStorage(connectionString, new MySqlStorageOptions

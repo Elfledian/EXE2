@@ -153,7 +153,7 @@ namespace FastWork.Controllers
 
         [Authorize]
         [HttpPut("add-cv-file")]
-        public async Task<IActionResult> UpdateProfile([FromQuery] Guid cvId)
+        public async Task<IActionResult> AddCVToProfile([FromQuery] Guid cvId)
         {
 
             var user = _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value).Result;
