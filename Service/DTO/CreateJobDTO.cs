@@ -22,9 +22,8 @@ namespace Service.DTO
         public string Benefits { get; set; }
 
         public decimal Salary { get; set; }
-
-        public string CompanyName { get; set; }
-
+        public Guid? CategoryId { get; set; }
         public string ContactPhone { get; set; }
+        public bool? IsUrgent { get; set; }
     }
 }

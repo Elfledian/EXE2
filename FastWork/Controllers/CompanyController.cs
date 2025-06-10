@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Repo.Data;
 using Repo.Entities;
+using Service.Services.RecruiterService;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,10 +14,12 @@ namespace FastWork.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly TheShineDbContext _context;
+        private readonly IRecruiterService _recruiterService;
 
-        public CompanyController(TheShineDbContext context)
+        public CompanyController(TheShineDbContext context, IRecruiterService recruiterService)
         {
             _context = context;
+            _recruiterService = recruiterService;
         }
 
         [HttpGet]
@@ -36,11 +40,32 @@ namespace FastWork.Controllers
             {
                 return BadRequest("Name and link are required.");
             }
+            if (User?.Identity?.IsAuthenticated != true || User.FindFirst(ClaimTypes.NameIdentifier) == null)
+            {
+                return Unauthorized(new { Message = "Authentication required or invalid token." });
+            }
+
+            Guid userId;
+            try
+            {
+                userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException("User ID claim not found."));
+            }
+            catch (FormatException)
+            {
+                return Unauthorized(new { Message = "Invalid user ID format in token." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { Message = ex.Message });
+            }
+
+
             var company = new Company
             {
                 CompanyName = hehe.name,
                 Website = hehe.link,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                RecruiterId = userId 
             };
             await _context.Companies.AddAsync(company);
             await _context.SaveChangesAsync();

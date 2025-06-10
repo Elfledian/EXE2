@@ -13,12 +13,7 @@ namespace Repo.GenericRepository
     public class GenericRepository<T> : IGenericRepository<T>
        where T : class
     {
-        private readonly TheShineDbContext _context;
-
-        public GenericRepository()
-        {
-            _context = new TheShineDbContext();
-        }
+        protected readonly TheShineDbContext _context;
 
         public GenericRepository(TheShineDbContext context)
         {

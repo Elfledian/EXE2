@@ -5,7 +5,7 @@ namespace Service.Services.JobService
 {
     public interface IJobService
     {
-        Task AddJobAsync(CreateJobDTO jobDto, Guid? recruiterId);
+        Task AddJobAsync(CreateJobDTO jobDto, Guid? recruiterId, Guid? userId);
         Task<List<Job>> GetAllJobsAsync();
         Task<Job> GetJobByIdAsync(Guid jobId);
     }
