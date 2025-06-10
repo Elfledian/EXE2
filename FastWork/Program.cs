@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using FastWork.Controllers;
+using Service.Services.JobService;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddCors(options =>
@@ -47,6 +48,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
+builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddHangfire(config => config
