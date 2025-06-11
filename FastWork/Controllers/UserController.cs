@@ -542,6 +542,16 @@ namespace FastWork.Controllers
             {
                 return NotFound(new AppResponse<object>().SetErrorResponse("User", new[] { "User not found." }));
             }
+            var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Candidate");
+            if (!roleAssignmentResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+                return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
+            }
+            if (!_userManager.IsInRoleAsync(user, "Candidate").Result)
+            {
+                return BadRequest(new AppResponse<object>().SetErrorResponse("Role", new[] { "User is not a candidate." }));
+            }
             Candidate candidate = new Candidate()
             {
                 CandidateId = Guid.NewGuid(),
