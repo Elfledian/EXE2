@@ -20,6 +20,7 @@ using FastWork.Controllers;
 using Service.Services.JobService;
 using Service.Services.RecruiterService;
 using Service.Services.CategoryService;
+using Service.Services.ApplicationsService;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddCors(options =>
@@ -56,6 +57,7 @@ builder.Services.AddScoped<RecruiterRepo>();
 builder.Services.AddScoped<CategoryRepo>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IApplicationServices, ApplicationServices>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddHangfire(config => config
