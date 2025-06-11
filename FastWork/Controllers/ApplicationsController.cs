@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Repo.Data;
 using Repo.Entities;
 using Service.Services.ApplicationsService;
 
@@ -14,10 +15,12 @@ namespace FastWork.Controllers
     {
         private readonly IApplicationServices _applicationServices;
         private readonly UserManager<User> _userManager;
-        public ApplicationsController(IApplicationServices applicationServices, UserManager<User> userManager)
+        private readonly TheShineDbContext _context;
+        public ApplicationsController(IApplicationServices applicationServices, UserManager<User> userManager, TheShineDbContext context)
         {
             _applicationServices = applicationServices ?? throw new ArgumentNullException(nameof(applicationServices));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         [Authorize]
         [HttpPost("apply/{jobId}")]
@@ -45,10 +48,20 @@ namespace FastWork.Controllers
             }
             return Ok(applications);
         }
-        [HttpGet("candidate/{candidateId}")]
-        public async Task<IActionResult> GetApplicationsByCandidateIdAsync(Guid candidateId)
+        [HttpGet("candidate/self")]
+        public async Task<IActionResult> GetApplicationsByCandidateIdAsync()
         {
-            var applications = await _applicationServices.GetApplicationsByCandidateIdAsync(candidateId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            var candidate = _context.Candidates.FirstOrDefault(c => c.UserId == Guid.Parse(userId));
+            if (candidate == null)
+            {
+                return NotFound("Candidate not found.");
+            }
+            var applications = await _applicationServices.GetApplicationsByCandidateIdAsync(candidate.CandidateId);
             if (applications == null || !applications.Any())
             {
                 return NotFound("No applications found for this candidate.");

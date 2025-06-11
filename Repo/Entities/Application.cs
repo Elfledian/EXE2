@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repo.Entities;
@@ -40,14 +41,17 @@ public partial class Application
     [Column("applied_at", TypeName = "datetime")]
     public DateTime? AppliedAt { get; set; }
 
+    [JsonIgnore]
     [ForeignKey("CandidateId")]
     [InverseProperty("Applications")]
     public virtual Candidate Candidate { get; set; }
 
+    [JsonIgnore]
     [ForeignKey("JobId")]
     [InverseProperty("Applications")]
     public virtual Job Job { get; set; }
 
+    [JsonIgnore]
     [InverseProperty("Application")]
     public virtual Payment Payment { get; set; }
 }

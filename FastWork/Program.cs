@@ -18,7 +18,10 @@ using Service;
 using Service.DTO;
 using Service.Services;
 using Service.Services.ApplicationsService;
+using Service.Services.CategoryService;
 using Service.Services.EmailService;
+using Service.Services.JobService;
+using Service.Services.RecruiterService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -77,8 +80,7 @@ GlobalConfiguration.Configuration.UseStorage(new MySqlStorage(connectionString, 
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
-    .UseRecommendedSerializerSettings()
-    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+    .UseRecommendedSerializerSettings());
 builder.Services.AddHangfireServer();
 builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
 

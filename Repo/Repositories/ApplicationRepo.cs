@@ -40,7 +40,7 @@ namespace Repo.Repositories
                 AboutMe = aboutMe ?? "About me text",
                 ApplicationId = Guid.NewGuid(),
                 CandidateId = user.Id,
-                Status = "Applied",
+                Status = "Applying",
                 InterviewType = "Online", // Default interview type, can be changed later
                 AppliedAt = DateTime.UtcNow,
                 Candidate = candidate,
