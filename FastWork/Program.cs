@@ -50,6 +50,12 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<PayOSService>();
 builder.Services.AddScoped<PaymentRepo>();
+builder.Services.AddScoped<JobRepo>();
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<RecruiterRepo>();
+builder.Services.AddScoped<CategoryRepo>();
+builder.Services.AddScoped<IRecruiterService, RecruiterService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddDbContext<TheShineDbContext>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IApplicationServices, ApplicationServices>();
@@ -71,8 +77,8 @@ GlobalConfiguration.Configuration.UseStorage(new MySqlStorage(connectionString, 
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
-    .UseRecommendedSerializerSettings());
-
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddHangfireServer();
 builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
 
