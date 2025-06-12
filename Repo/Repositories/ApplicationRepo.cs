@@ -132,6 +132,10 @@ namespace Repo.Repositories
                 .Include(a => a.Job)
                 .ToListAsync();
         }
-        
+        public async Task<int> GetAmmountOfApplicationsByJobIdAsync(Guid jobId)
+        {
+            return await _context.Applications
+                .CountAsync(a => a.JobId == jobId);
+        }
     }
 }
