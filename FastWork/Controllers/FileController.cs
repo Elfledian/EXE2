@@ -12,6 +12,8 @@ using Repo.Data;
 using Repo.Entities;
 using Service.Helper;
 using File = Repo.Entities.File;
+using System.Security.Claims;
+using MySql.Data.MySqlClient;
 
 namespace FastWork.Controllers
 {
@@ -29,7 +31,7 @@ namespace FastWork.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFileAdoAsync(IFormFile file)
+        public async Task<IActionResult> UploadSQLServer(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
@@ -105,6 +107,49 @@ namespace FastWork.Controllers
         {
             public IFormFile File { get; set; }
         }
+        //[HttpPost("uploadMySql")]
+        //public async Task<IActionResult> UploadFileMySql(IFormFile file)
+        //{
+        //    if (file == null || file.Length == 0)
+        //        return BadRequest("No file uploaded");
+
+        //    byte[] fileBytes;
+        //    using (var ms = new MemoryStream())
+        //    {
+        //        await file.CopyToAsync(ms);
+        //        fileBytes = ms.ToArray();
+        //    }
+
+        //    var fileId = Guid.NewGuid();
+        //    var fileName = file.FileName;
+        //    var contentType = file.ContentType;
+        //    var uploadDate = DateTime.UtcNow;
+
+        //    var connectionString = _context.Database.GetDbConnection().ConnectionString;
+
+        //    await using var connection = new MySqlConnection(connectionString);
+        //    await connection.OpenAsync();
+
+        //    var cmdText = @"
+        //INSERT INTO files (file_id, file_name, file_type, content_type, file_data, upload_date)
+        //VALUES (@fileId, @fileName, @fileType, @contentType, @fileData, @uploadDate)";
+
+        //    await using var cmd = new MySqlCommand(cmdText, connection);
+        //    cmd.Parameters.AddWithValue("@fileId", fileId.ToString());
+        //    cmd.Parameters.AddWithValue("@fileName", fileName);
+        //    cmd.Parameters.AddWithValue("@fileType", contentType);
+        //    cmd.Parameters.AddWithValue("@contentType", contentType);
+        //    cmd.Parameters.Add("@fileData", MySqlDbType.LongBlob).Value = fileBytes;
+        //    cmd.Parameters.AddWithValue("@uploadDate", uploadDate);
+
+        //    var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+        //    if (rowsAffected == 1)
+        //        return Ok(new { id = fileId });
+        //    else
+        //        return StatusCode(500, "Error inserting file");
+        //}
+
 
         // GET: api/File/download/{id}
         [HttpGet("download/{id}")]

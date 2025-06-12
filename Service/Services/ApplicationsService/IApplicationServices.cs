@@ -13,5 +13,6 @@ namespace Service.Services.ApplicationsService
         Task<List<Application>> GetApplicationsByJobIdAsync(Guid jobId);
         Task<List<Application>> GetApplicationsByStatusAsync(string status);
         Task UpdateApplicationAsync(Application application);
+        Task<int> GetAmmountOfApplicationsByJobIdAsync(Guid jobId);
     }
 }

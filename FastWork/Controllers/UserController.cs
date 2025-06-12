@@ -266,7 +266,14 @@ namespace FastWork.Controllers
             {
                 return BadRequest(new AppResponse<object>().SetErrorResponse("EmailConfirmation", new[] { "Email confirmation failed." }));
             }
-
+            CandidateRegisterDto candidateRegisterDto = new CandidateRegisterDto()
+            {
+                Education = "haha",
+                Gender = "male",
+                IncomeRange = "1000-2000",
+                Status = "Full-time"
+            };
+            var res = RegisterCandidate(candidateRegisterDto);
             return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Email confirmed successfully."));
         }
 
@@ -574,6 +581,46 @@ namespace FastWork.Controllers
             return Ok(new AppResponse<object>().SetSuccessResponse(candidate, "Message", "Candidate registration successful."));
         }
 
+        [HttpPost("register-candidate")]
+        public async Task<IActionResult> RegisterCandidate([FromBody] CandidateRegisterDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToArray();
+                return BadRequest(new AppResponse<object>().SetErrorResponse("ModelState", errors));
+            }
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new AppResponse<object>().SetErrorResponse("User", new[] { "User not authenticated." }));
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new AppResponse<object>().SetErrorResponse("User", new[] { "User not found." }));
+            }
+            Candidate candidate = new Candidate()
+            {
+                CandidateId = Guid.NewGuid(),
+                Education = model.Education,
+                Gender = model.Gender,
+                IncomeRange = model.IncomeRange,
+                Status = model.Status,
+                Verified = false,
+                Featured = false,
+                UserId = user.Id,
+                User = user
+            };
+            User existingCandidate = await _context.Users.Include(u => u.Candidate).FirstOrDefaultAsync(u => u.Id == user.Id);
+            if (existingCandidate?.Candidate != null)
+            {
+                return BadRequest(new AppResponse<object>().SetErrorResponse("Candidate", new[] { "Candidate already registered." }));
+            }
+            await _context.Candidates.AddAsync(candidate);
+            await _context.SaveChangesAsync();
+            return Ok(new AppResponse<object>().SetSuccessResponse(candidate, "Message", "Candidate registration successful."));
+        }
+
         public sealed record RegisterDto(string Email, string FullName, string PhoneNumber, string Password);
         public sealed record LoginDto(string Email, string Password);
         public sealed record ResendConfirmationDto(string Email);
@@ -618,6 +665,5 @@ namespace FastWork.Controllers
             [StringLength(50)]
             public string IncomeRange { get; init; }
         }
-
     }
 }

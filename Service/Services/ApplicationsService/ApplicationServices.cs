@@ -52,5 +52,9 @@ namespace Service.Services.ApplicationsService
         {
             return await _applicationRepo.GetApplicationsByStatusAsync(status);
         }
+        public async Task<int> GetAmmountOfApplicationsByJobIdAsync(Guid jobId)
+        {
+            return await _applicationRepo.GetAmmountOfApplicationsByJobIdAsync(jobId);
+        }
     }
 }
