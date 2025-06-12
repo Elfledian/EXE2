@@ -266,14 +266,14 @@ namespace FastWork.Controllers
             {
                 return BadRequest(new AppResponse<object>().SetErrorResponse("EmailConfirmation", new[] { "Email confirmation failed." }));
             }
-            //CandidateRegisterDto candidateRegisterDto = new CandidateRegisterDto()
-            //{
-            //    Education = "haha",
-            //    Gender = "male",
-            //    IncomeRange = "1000-2000",
-            //    Status = "Full-time"
-            //};
-            //var res = RegisterCandidate(candidateRegisterDto);
+            CandidateRegisterDto candidateRegisterDto = new CandidateRegisterDto()
+            {
+                Education = "haha",
+                Gender = "male",
+                IncomeRange = "1000-2000",
+                Status = "Full-time"
+            };
+            var res = RegisterCandidate(candidateRegisterDto);
             return Ok(new AppResponse<object>().SetSuccessResponse(null, "Message", "Email confirmed successfully."));
         }
 
