@@ -115,6 +115,38 @@ namespace FastWork.Controllers
             var files = _context.Set<File>().ToList();
             return Ok(files);
         }
+
+
+
+        [HttpGet("showPicture")]
+        public async Task<IActionResult> GetImage(Guid picId)
+        {
+            try
+            {
+                var file = await _context.Files
+                    .Where(f => f.FileId == picId)
+                    .FirstOrDefaultAsync();
+
+                if (file == null)
+                {
+                    return NotFound("File not found");
+                }
+
+                // Check if file is an image based on content type
+                if (string.IsNullOrEmpty(file.ContentType) ||
+                    !file.ContentType.StartsWith("image/"))
+                {
+                    return BadRequest("File is not an image");
+                }
+
+                return File(file.FileData, file.ContentType);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFileById(Guid id)
         {
