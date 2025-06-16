@@ -531,55 +531,6 @@ namespace FastWork.Controllers
                 .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
             return BadRequest(new AppResponse<object>().SetErrorResponse(identityErrors));
         }
-        [HttpPost("register-candidate")]
-        public async Task<IActionResult> RegisterCandidate([FromBody] CandidateRegisterDto model)
-        {
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToArray();
-                return BadRequest(new AppResponse<object>().SetErrorResponse("ModelState", errors));
-            }
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized(new AppResponse<object>().SetErrorResponse("User", new[] { "User not authenticated." }));
-            }
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return NotFound(new AppResponse<object>().SetErrorResponse("User", new[] { "User not found." }));
-            }
-            var roleAssignmentResult = await _userManager.AddToRoleAsync(user, "Candidate");
-            if (!roleAssignmentResult.Succeeded)
-            {
-                await _userManager.DeleteAsync(user);
-                return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
-            }
-            if (!_userManager.IsInRoleAsync(user, "Candidate").Result)
-            {
-                return BadRequest(new AppResponse<object>().SetErrorResponse("Role", new[] { "User is not a candidate." }));
-            }
-            Candidate candidate = new Candidate()
-            {
-                CandidateId = Guid.NewGuid(),
-                Education = model.Education,
-                Gender = model.Gender,
-                IncomeRange = model.IncomeRange,
-                Status = model.Status,
-                Verified = false,
-                Featured = false,
-                UserId = user.Id,
-                User = user
-            };
-            User existingCandidate = await _context.Users.Include(u => u.Candidate).FirstOrDefaultAsync(u => u.Id == user.Id);
-            if (existingCandidate?.Candidate != null)
-            {
-                return BadRequest(new AppResponse<object>().SetErrorResponse("Candidate", new[] { "Candidate already registered." }));
-            }
-            await _context.Candidates.AddAsync(candidate);
-            await _context.SaveChangesAsync();
-            return Ok(new AppResponse<object>().SetSuccessResponse(candidate, "Message", "Candidate registration successful."));
-        }
 
         [HttpPost("register-candidate")]
         public async Task<IActionResult> RegisterCandidate([FromBody] CandidateRegisterDto model)
