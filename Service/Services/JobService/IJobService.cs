@@ -8,5 +8,6 @@ namespace Service.Services.JobService
         Task AddJobAsync(CreateJobDTO jobDto, Guid? recruiterId, Guid? userId);
         Task<List<Job>> GetAllJobsAsync();
         Task<Job> GetJobByIdAsync(Guid jobId);
+        Task<List<Job>> GetJobsByRecruiterIdAsync(Guid recruiterId);
     }
 }

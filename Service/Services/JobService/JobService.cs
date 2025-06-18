@@ -19,7 +19,7 @@ namespace Service.Services.JobService
         private readonly JobRepo _jobRepo;
         private readonly RecruiterRepo _recruiterRepo;
         private readonly UserManager<User> _userManager;
-        
+
         public JobService(JobRepo jobRepo, RecruiterRepo recruiterRepo)
         {
             _jobRepo = jobRepo ?? throw new ArgumentNullException(nameof(jobRepo));
@@ -33,7 +33,7 @@ namespace Service.Services.JobService
         {
             return await _jobRepo.GetEntityByIdAsync(jobId);
         }
-        
+
         public async Task AddJobAsync(CreateJobDTO jobDto, Guid? recruitetId, Guid? userId)
         {
             var company = await _recruiterRepo.GetCompanyAsyncof(userId);
@@ -61,6 +61,10 @@ namespace Service.Services.JobService
             if (job == null) throw new ArgumentNullException(nameof(job));
             await _jobRepo.AddAsync(job);
             await _jobRepo.SaveChangesAsync();
+        }
+        public async Task<List<Job>> GetJobsByRecruiterIdAsync(Guid recruiterId)
+        {
+            return await _jobRepo.GetJobsByRecruiterIdAsync(recruiterId);
         }
     }
 }

@@ -106,7 +106,6 @@ namespace Service.Services
 
             // Map webhook code to payment status
             string status = webhookBody.code == "00" ? "PAID" : "PENDING"; // Adjust based on PayOS documentation
-
             // Parse transactionDateTime to DateTime (assuming format like "2023-11-21 15:20:34")
             DateTime? transactionDate = null;
             if (!string.IsNullOrEmpty(webhookData.transactionDateTime))

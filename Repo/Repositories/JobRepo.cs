@@ -1,4 +1,5 @@
-﻿using Repo.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Repo.Data;
 using Repo.Entities;
 using Repo.GenericRepository;
 using System;
@@ -13,6 +14,12 @@ namespace Repo.Repositories
     {
         public JobRepo(TheShineDbContext context) : base(context)
         {
+        }
+        public async Task<List<Job>> GetJobsByRecruiterIdAsync(Guid recruiterId)
+        {
+            return await _context.Jobs
+                .Where(job => job.RecruiterId == recruiterId)
+                .ToListAsync();
         }
     }
 }
