@@ -71,13 +71,34 @@ namespace FastWork.Controllers
 
             try
             {
-                await _jobService.AddJobAsync(jobDto, recruiter.RecruiterId,userId);
+                await _jobService.AddJobAsync(jobDto, recruiter.RecruiterId, userId);
                 return Ok(new { Message = "Job created successfully." });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "An error occurred while creating the job.", Error = ex.Message });
             }
+        }
+        [HttpGet("GetByRecruiterId")]
+        public async Task<IActionResult> GetByRecruiterId()
+        {
+            var userId = Guid.Parse(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized(new { Message = "User ID not found in the token." });
+            }
+            var recruiter = await _recruiterService.GetByUserId(userId);
+            if (recruiter == null)
+            {
+                return NotFound(new { Message = "Recruiter not found for the authenticated user." });
+            }
+            var recruiterId = recruiter.RecruiterId;
+            var jobs = await _jobService.GetJobsByRecruiterIdAsync(recruiterId);
+            if (jobs == null || !jobs.Any())
+            {
+                return NotFound(new { Message = "No jobs found for the specified recruiter." });
+            }
+            return Ok(jobs);
         }
     }
 }
