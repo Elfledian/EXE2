@@ -623,10 +623,6 @@ namespace Repo.Migrations
                         .HasDefaultValue("Open")
                         .HasColumnName("status");
 
-                    b.Property<Guid?>("SubscriptionId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("subscription_id");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -644,8 +640,6 @@ namespace Repo.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("SubscriptionId");
 
                     b.HasIndex(new[] { "RecruiterId" }, "idx_jobs_recruiter_id");
 
@@ -825,12 +819,6 @@ namespace Repo.Migrations
                         .HasColumnName("subscription_id")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<bool?>("CandidatesManagement")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("candidates_management");
-
                     b.Property<int>("DurationDays")
                         .HasColumnType("int")
                         .HasColumnName("duration_days");
@@ -843,6 +831,12 @@ namespace Repo.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("features");
 
+                    b.Property<bool?>("IsActivated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_activated");
+
                     b.Property<decimal?>("OriginalPrice")
                         .HasColumnType("decimal(10, 2)")
                         .HasColumnName("original_price");
@@ -852,17 +846,9 @@ namespace Repo.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("plan");
 
-                    b.Property<int>("PostLimit")
-                        .HasColumnType("int")
-                        .HasColumnName("post_limit");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10, 2)")
                         .HasColumnName("price");
-
-                    b.Property<Guid?>("RecruiterId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("recruiter_id");
 
                     b.Property<DateTime?>("StartDate")
                         .ValueGeneratedOnAdd()
@@ -882,16 +868,14 @@ namespace Repo.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("subtitle");
 
-                    b.Property<bool?>("UrgentHiring")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("urgent_hiring");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("user_id");
 
                     b.HasKey("SubscriptionId")
                         .HasName("PK__subscrip__863A7EC161176C70");
 
-                    b.HasIndex("RecruiterId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("subscriptions");
                 });
@@ -1301,18 +1285,11 @@ namespace Repo.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__jobs__recruiter___74AE54BC");
 
-                    b.HasOne("Repo.Entities.Subscription", "Subscription")
-                        .WithMany("Jobs")
-                        .HasForeignKey("SubscriptionId")
-                        .HasConstraintName("FK__jobs__subscripti__76969D2E");
-
                     b.Navigation("Category");
 
                     b.Navigation("Company");
 
                     b.Navigation("Recruiter");
-
-                    b.Navigation("Subscription");
                 });
 
             modelBuilder.Entity("Repo.Entities.Notification", b =>
@@ -1360,13 +1337,13 @@ namespace Repo.Migrations
 
             modelBuilder.Entity("Repo.Entities.Subscription", b =>
                 {
-                    b.HasOne("Repo.Entities.Recruiter", "Recruiter")
-                        .WithMany("Subscriptions")
-                        .HasForeignKey("RecruiterId")
+                    b.HasOne("Repo.Entities.User", "User")
+                        .WithMany("Subscription")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__subscript__recru__6A30C649");
+                        .HasConstraintName("FK__subscript__user__6A30C649");
 
-                    b.Navigation("Recruiter");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repo.Entities.User", b =>
@@ -1445,13 +1422,6 @@ namespace Repo.Migrations
                     b.Navigation("Invitations");
 
                     b.Navigation("Jobs");
-
-                    b.Navigation("Subscriptions");
-                });
-
-            modelBuilder.Entity("Repo.Entities.Subscription", b =>
-                {
-                    b.Navigation("Jobs");
                 });
 
             modelBuilder.Entity("Repo.Entities.User", b =>
@@ -1465,6 +1435,8 @@ namespace Repo.Migrations
                     b.Navigation("Ratings");
 
                     b.Navigation("Recruiter");
+
+                    b.Navigation("Subscription");
 
                     b.Navigation("Verification");
                 });

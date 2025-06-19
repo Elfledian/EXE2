@@ -189,8 +189,6 @@ namespace Repo.Data
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__jobs__recruiter___74AE54BC");
 
-                entity.HasOne(d => d.Subscription).WithMany(p => p.Jobs).HasConstraintName("FK__jobs__subscripti__76969D2E");
-
                 entity.HasMany(d => d.Tags).WithMany(p => p.Jobs)
                     .UsingEntity<Dictionary<string, object>>(
                         "JobTag",
@@ -262,14 +260,13 @@ namespace Repo.Data
                 entity.HasKey(e => e.SubscriptionId).HasName("PK__subscrip__863A7EC161176C70");
 
                 entity.Property(e => e.SubscriptionId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.CandidatesManagement).HasDefaultValue(false);
+                entity.Property(e => e.IsActivated).HasDefaultValue(true);
                 entity.Property(e => e.StartDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Active");
-                entity.Property(e => e.UrgentHiring).HasDefaultValue(false);
 
-                entity.HasOne(d => d.Recruiter).WithMany(p => p.Subscriptions)
+                entity.HasOne(d => d.User).WithMany(p => p.Subscription)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK__subscript__recru__6A30C649");
+                    .HasConstraintName("FK__subscript__user__6A30C649");
             });
 
             modelBuilder.Entity<Tag>(entity =>

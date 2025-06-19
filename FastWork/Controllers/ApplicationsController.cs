@@ -119,7 +119,8 @@ namespace FastWork.Controllers
         public async Task<IActionResult> GetAmmountOfApplicationsByJobIdAsync(Guid jobId)
         {
             var count = await _applicationServices.GetAmmountOfApplicationsByJobIdAsync(jobId);
-            return Ok(new { Count = count });
+            var result = "There are " + count + "applications for this job.";
+            return Ok(result);
         }
         public class ApplyRequest
         {

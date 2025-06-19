@@ -22,9 +22,6 @@ public partial class Job
     [Column("company_id")]
     public Guid? CompanyId { get; set; }
 
-    [Column("subscription_id")]
-    public Guid? SubscriptionId { get; set; }
-
     [Column("category_id")]
     public Guid? CategoryId { get; set; }
 
@@ -103,10 +100,6 @@ public partial class Job
     [ForeignKey("RecruiterId")]
     [InverseProperty("Jobs")]
     public virtual Recruiter Recruiter { get; set; }
-
-    [ForeignKey("SubscriptionId")]
-    [InverseProperty("Jobs")]
-    public virtual Subscription Subscription { get; set; }
 
     [ForeignKey("JobId")]
     [InverseProperty("Jobs")]

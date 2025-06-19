@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repo.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class @int : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -330,6 +330,34 @@ namespace Repo.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "subscriptions",
+                columns: table => new
+                {
+                    subscription_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    plan = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    subtitle = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    duration_days = table.Column<int>(type: "int", nullable: false),
+                    is_activated = table.Column<bool>(type: "bit", nullable: true, defaultValue: true),
+                    price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    original_price = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    features = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    start_date = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    end_date = table.Column<DateTime>(type: "datetime", nullable: true),
+                    status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Active")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__subscrip__863A7EC161176C70", x => x.subscription_id);
+                    table.ForeignKey(
+                        name: "FK__subscript__user__6A30C649",
+                        column: x => x.user_id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "verifications",
                 columns: table => new
                 {
@@ -405,43 +433,12 @@ namespace Repo.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "subscriptions",
-                columns: table => new
-                {
-                    subscription_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    recruiter_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    plan = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    subtitle = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    post_limit = table.Column<int>(type: "int", nullable: false),
-                    duration_days = table.Column<int>(type: "int", nullable: false),
-                    urgent_hiring = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
-                    candidates_management = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
-                    price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    original_price = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    features = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    start_date = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    end_date = table.Column<DateTime>(type: "datetime", nullable: true),
-                    status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Active")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__subscrip__863A7EC161176C70", x => x.subscription_id);
-                    table.ForeignKey(
-                        name: "FK__subscript__recru__6A30C649",
-                        column: x => x.recruiter_id,
-                        principalTable: "recruiters",
-                        principalColumn: "recruiter_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "jobs",
                 columns: table => new
                 {
                     job_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     recruiter_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     company_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    subscription_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     category_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     position = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
@@ -480,11 +477,6 @@ namespace Repo.Migrations
                         principalTable: "recruiters",
                         principalColumn: "recruiter_id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK__jobs__subscripti__76969D2E",
-                        column: x => x.subscription_id,
-                        principalTable: "subscriptions",
-                        principalColumn: "subscription_id");
                 });
 
             migrationBuilder.CreateTable(
@@ -740,11 +732,6 @@ namespace Repo.Migrations
                 column: "company_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_jobs_subscription_id",
-                table: "jobs",
-                column: "subscription_id");
-
-            migrationBuilder.CreateIndex(
                 name: "idx_notifications_user_id",
                 table: "notifications",
                 column: "user_id");
@@ -769,9 +756,9 @@ namespace Repo.Migrations
                 filter: "[user_id] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_subscriptions_recruiter_id",
+                name: "IX_subscriptions_user_id",
                 table: "subscriptions",
-                column: "recruiter_id");
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "UQ__tags__72E12F1B77600626",
@@ -829,6 +816,9 @@ namespace Repo.Migrations
                 name: "ratings");
 
             migrationBuilder.DropTable(
+                name: "subscriptions");
+
+            migrationBuilder.DropTable(
                 name: "verifications");
 
             migrationBuilder.DropTable(
@@ -854,9 +844,6 @@ namespace Repo.Migrations
 
             migrationBuilder.DropTable(
                 name: "companies");
-
-            migrationBuilder.DropTable(
-                name: "subscriptions");
 
             migrationBuilder.DropTable(
                 name: "recruiters");

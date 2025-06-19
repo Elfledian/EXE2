@@ -63,6 +63,10 @@ public partial class User : IdentityUser<Guid>
     [InverseProperty("Recruiter")]
     public virtual Company Company { get; set; }
 
+
+    [InverseProperty("User")]
+    public virtual ICollection<Subscription> Subscription { get; set; } = new List<Subscription>();
+
     [InverseProperty("User")]
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 

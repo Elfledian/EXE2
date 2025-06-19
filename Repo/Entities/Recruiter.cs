@@ -40,9 +40,6 @@ public partial class Recruiter
     [InverseProperty("Recruiter")]
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
-    [InverseProperty("Recruiter")]
-    public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
-
     [ForeignKey("UserId")]
     [InverseProperty("Recruiter")]
     public virtual User User { get; set; }

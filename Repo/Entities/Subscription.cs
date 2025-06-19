@@ -15,8 +15,8 @@ public partial class Subscription
     [Column("subscription_id")]
     public Guid SubscriptionId { get; set; }
 
-    [Column("recruiter_id")]
-    public Guid? RecruiterId { get; set; }
+    [Column("user_id")]
+    public Guid? UserId { get; set; }
 
     [Column("plan")]
     [StringLength(50)]
@@ -26,17 +26,11 @@ public partial class Subscription
     [StringLength(255)]
     public string Subtitle { get; set; }
 
-    [Column("post_limit")]
-    public int PostLimit { get; set; }
-
     [Column("duration_days")]
     public int DurationDays { get; set; }
 
-    [Column("urgent_hiring")]
-    public bool? UrgentHiring { get; set; }
-
-    [Column("candidates_management")]
-    public bool? CandidatesManagement { get; set; }
+    [Column("is_activated")]
+    public bool? IsActivated { get; set; }
 
     [Column("price", TypeName = "decimal(10, 2)")]
     public decimal Price { get; set; }
@@ -57,10 +51,7 @@ public partial class Subscription
     [StringLength(50)]
     public string Status { get; set; }
 
+    [ForeignKey("UserId")]
     [InverseProperty("Subscription")]
-    public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
-
-    [ForeignKey("RecruiterId")]
-    [InverseProperty("Subscriptions")]
-    public virtual Recruiter Recruiter { get; set; }
+    public virtual User User { get; set; }
 }
