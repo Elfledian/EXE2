@@ -700,10 +700,6 @@ namespace Repo.Migrations
                         .HasColumnType("decimal(10, 2)")
                         .HasColumnName("amount");
 
-                    b.Property<Guid?>("ApplicationId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("application_id");
-
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("datetime")
                         .HasColumnName("paid_at");
@@ -720,12 +716,14 @@ namespace Repo.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("transaction_id");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("user_id");
+
                     b.HasKey("PaymentId")
                         .HasName("PK__payments__ED1FC9EAC80CA886");
 
-                    b.HasIndex(new[] { "ApplicationId" }, "UQ__payments__3BCBDCF3629EA847")
-                        .IsUnique()
-                        .HasFilter("[application_id] IS NOT NULL");
+                    b.HasIndex(new[] { "UserId" }, "idx_payments_userid");
 
                     b.ToTable("payments");
                 });
@@ -1305,13 +1303,13 @@ namespace Repo.Migrations
 
             modelBuilder.Entity("Repo.Entities.Payment", b =>
                 {
-                    b.HasOne("Repo.Entities.Application", "Application")
-                        .WithOne("Payment")
-                        .HasForeignKey("Repo.Entities.Payment", "ApplicationId")
+                    b.HasOne("Repo.Entities.User", "User")
+                        .WithMany("Payment")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__payments__applic__1332DBDC");
+                        .HasConstraintName("FK__payments__user__1332DBDC");
 
-                    b.Navigation("Application");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repo.Entities.Rating", b =>
@@ -1377,11 +1375,6 @@ namespace Repo.Migrations
                     b.Navigation("Candidate");
                 });
 
-            modelBuilder.Entity("Repo.Entities.Application", b =>
-                {
-                    b.Navigation("Payment");
-                });
-
             modelBuilder.Entity("Repo.Entities.Candidate", b =>
                 {
                     b.Navigation("Applications");
@@ -1431,6 +1424,8 @@ namespace Repo.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("Payment");
 
                     b.Navigation("Ratings");
 

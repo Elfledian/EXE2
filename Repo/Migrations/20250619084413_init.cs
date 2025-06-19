@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repo.Migrations
 {
     /// <inheritdoc />
-    public partial class @int : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -280,6 +280,28 @@ namespace Repo.Migrations
                     table.PrimaryKey("PK__notifica__E059842F6357338B", x => x.notification_id);
                     table.ForeignKey(
                         name: "FK__notificat__user___2645B050",
+                        column: x => x.user_id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "payments",
+                columns: table => new
+                {
+                    payment_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Pending"),
+                    transaction_id = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    paid_at = table.Column<DateTime>(type: "datetime", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__payments__ED1FC9EAC80CA886", x => x.payment_id);
+                    table.ForeignKey(
+                        name: "FK__payments__user__1332DBDC",
                         column: x => x.user_id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -565,28 +587,6 @@ namespace Repo.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "payments",
-                columns: table => new
-                {
-                    payment_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    application_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Pending"),
-                    transaction_id = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    paid_at = table.Column<DateTime>(type: "datetime", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__payments__ED1FC9EAC80CA886", x => x.payment_id);
-                    table.ForeignKey(
-                        name: "FK__payments__applic__1332DBDC",
-                        column: x => x.application_id,
-                        principalTable: "applications",
-                        principalColumn: "application_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "idx_applications_candidate_id",
                 table: "applications",
@@ -737,11 +737,9 @@ namespace Repo.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__payments__3BCBDCF3629EA847",
+                name: "idx_payments_userid",
                 table: "payments",
-                column: "application_id",
-                unique: true,
-                filter: "[application_id] IS NOT NULL");
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_ratings_reviewer_id",
@@ -782,6 +780,9 @@ namespace Repo.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "applications");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -828,16 +829,13 @@ namespace Repo.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "jobs");
+
+            migrationBuilder.DropTable(
                 name: "tags");
 
             migrationBuilder.DropTable(
-                name: "applications");
-
-            migrationBuilder.DropTable(
                 name: "candidates");
-
-            migrationBuilder.DropTable(
-                name: "jobs");
 
             migrationBuilder.DropTable(
                 name: "categories");

@@ -48,6 +48,4 @@ public partial class Application
     [InverseProperty("Applications")]
     public virtual Job Job { get; set; }
 
-    [InverseProperty("Application")]
-    public virtual Payment Payment { get; set; }
 }

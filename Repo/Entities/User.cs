@@ -48,11 +48,9 @@ public partial class User : IdentityUser<Guid>
     [Column("updated_at", TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
 
-    // ✅ NEW FIELD: Foreign key to File
     [Column("cvfileid")]
     public Guid? CvFileId { get; set; }
 
-    // ✅ NEW NAVIGATION PROPERTY
     [ForeignKey("CvFileId")]
     [InverseProperty("UsersWithCvFile")]
     public virtual File CvFile { get; set; }
@@ -69,6 +67,8 @@ public partial class User : IdentityUser<Guid>
 
     [InverseProperty("User")]
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    [InverseProperty("User")]
+    public virtual ICollection<Payment> Payment { get; set; } = new List<Payment>();
 
     [InverseProperty("Reviewer")]
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();

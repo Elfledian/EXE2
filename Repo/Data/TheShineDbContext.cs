@@ -228,9 +228,9 @@ namespace Repo.Data
                 entity.Property(e => e.PaymentId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Status).HasDefaultValue("Pending");
 
-                entity.HasOne(d => d.Application).WithOne(p => p.Payment)
+                entity.HasOne(d => d.User).WithMany(p => p.Payment)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK__payments__applic__1332DBDC");
+                    .HasConstraintName("FK__payments__user__1332DBDC");
             });
 
             modelBuilder.Entity<Rating>(entity =>

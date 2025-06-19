@@ -9,15 +9,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Repo.Entities;
 
 [Table("payments")]
-[Index("ApplicationId", Name = "UQ__payments__3BCBDCF3629EA847", IsUnique = true)]
+[Index("UserId", Name = "idx_payments_userid")]
 public partial class Payment
 {
     [Key]
     [Column("payment_id")]
     public Guid PaymentId { get; set; }
 
-    [Column("application_id")]
-    public Guid? ApplicationId { get; set; }
+    [Column("user_id")]
+    public Guid? UserId { get; set; }
 
     [Column("amount", TypeName = "decimal(10, 2)")]
     public decimal Amount { get; set; }
@@ -33,7 +33,7 @@ public partial class Payment
     [Column("paid_at", TypeName = "datetime")]
     public DateTime? PaidAt { get; set; }
 
-    [ForeignKey("ApplicationId")]
+    [ForeignKey("UserId")]
     [InverseProperty("Payment")]
-    public virtual Application Application { get; set; }
+    public virtual User User { get; set; }
 }
