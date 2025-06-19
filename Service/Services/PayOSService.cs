@@ -20,6 +20,7 @@ namespace Service.Services
         private readonly PayOS _payOS;
 
         private readonly PaymentRepo _paymentRepo;
+        private readonly SubscriptionRepo _subscriptionRepo; 
         public PayOSService(IOptions<PayOSSettings> options, PaymentRepo paymentRepo)
         {
             var settings = options.Value;
@@ -105,7 +106,8 @@ namespace Service.Services
             var webhookData = _payOS.verifyPaymentWebhookData(webhookBody);
 
             // Map webhook code to payment status
-            string status = webhookBody.code == "00" ? "PAID" : "PENDING"; // Adjust based on PayOS documentation
+            string status = webhookBody.code == "00" ? "PAID" : "FAILED";
+
             // Parse transactionDateTime to DateTime (assuming format like "2023-11-21 15:20:34")
             DateTime? transactionDate = null;
             if (!string.IsNullOrEmpty(webhookData.transactionDateTime))
@@ -126,6 +128,25 @@ namespace Service.Services
                 payment.PaidAt = status == "PAID" ? (transactionDate ?? payment.PaidAt) : payment.PaidAt;
                 payment.Amount = webhookData.amount; // Update amount in case it changed
                 await _paymentRepo.UpdatePaymentAsync(payment);
+
+                if (status == "PAID")
+                {
+                    // Create subscription only for successful payments
+                    var subscription = new Subscription
+                    {
+                        SubscriptionId = Guid.NewGuid(),
+                        UserId = payment.UserId,
+                        IsActivated = true,
+                        Price = webhookData.amount,
+                        Subtitle = webhookData.description,
+                        OriginalPrice = payment.Amount,
+                        StartDate = transactionDate ?? DateTime.UtcNow.AddHours(7),
+                        EndDate = transactionDate.HasValue ? transactionDate.Value.AddDays(30) : DateTime.UtcNow.AddHours(7).AddDays(30),
+                        Status = "Active"
+                    };
+                    // Assuming a subscription repository exists
+                    await _subscriptionRepo.AddAsync(subscription);
+                }
             }
             else
             {
@@ -139,6 +160,25 @@ namespace Service.Services
                     PaidAt = status == "PAID" ? (transactionDate ?? DateTime.UtcNow.AddHours(7)) : DateTime.UtcNow.AddHours(7)
                 };
                 await _paymentRepo.AddPaymentAsync(payment);
+
+                if (status == "PAID")
+                {
+                    // Create subscription only for successful payments
+                    var subscription = new Subscription
+                    {
+                        SubscriptionId = Guid.NewGuid(),
+                        UserId = payment.UserId, // Assumes payment.UserId is available or needs to be set
+                        IsActivated = true,
+                        Price = webhookData.amount,
+                        Subtitle = webhookData.description,
+                        OriginalPrice = payment.Amount,
+                        StartDate = transactionDate ?? DateTime.UtcNow.AddHours(7),
+                        EndDate = transactionDate.HasValue ? transactionDate.Value.AddDays(30) : DateTime.UtcNow.AddHours(7).AddDays(30),
+                        Status = "Active"
+                    };
+                    // Assuming a subscription repository exists
+                    await _subscriptionRepo.AddAsync(subscription);
+                }
             }
         }
     }
