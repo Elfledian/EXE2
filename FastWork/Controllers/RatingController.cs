@@ -18,7 +18,7 @@ namespace FastWork.Controllers
             _userManager = userManager;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> AddRating([FromBody] RatingService.RatingDto rating)
+        public async Task<IActionResult> AddRating([FromBody] RatingService.RatingDtoCreate rating)
         {
             if (rating == null)
             {
@@ -79,6 +79,40 @@ namespace FastWork.Controllers
             }
             await _ratingService.UpdateRatingAsync(rating, user.Id);
             return Ok("Rating updated successfully.");
+        }
+        [HttpGet("1")]
+        public async Task<IActionResult> GetRatingsByContributed1()
+        {
+            var ratings = await _ratingService.GetRatingsByContributed1();
+            return Ok(ratings);
+        }
+        [HttpGet("2")]
+        public async Task<IActionResult> GetRatingsByContributed2()
+        {
+            var ratings = await _ratingService.GetRatingsByContributed2();
+            return Ok(ratings);
+        }
+        [HttpGet("check-contributed-1")]
+        public async Task<IActionResult> CheckIfUserHaveContributedCommentEqual1()
+        {
+            var user = _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value).Result;
+            if (user == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            var result = await _ratingService.CheckIfUserHaveContributedCommentEqual1OrNot(user);
+            return Ok(result);
+        }
+        [HttpGet("check-contributed-2")]
+        public async Task<IActionResult> CheckIfUserHaveContributedCommentEqual2()
+        {
+            var user = _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value).Result;
+            if (user == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            var result = await _ratingService.CheckIfUserHaveContributedCommentEqual2OrNot(user);
+            return Ok(result);
         }
     }
 }

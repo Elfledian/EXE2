@@ -21,5 +21,31 @@ namespace Repo.Repositories
                 .Where(rating => rating.ReviewerId == reviewerId)
                 .ToListAsync();
         }
+        public async Task<List<Rating>> GetAllRatingsSortByCreateDateContributedCommentEqual1Async()
+        {
+            return await _context.Ratings
+                .Where(rating => rating.ContributedComment == "1")
+                .OrderByDescending(rating => rating.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task<List<Rating>> GetAllRatingsSortByCreateDateContributedCommentEqual2Async()
+        {
+            return await _context.Ratings
+                .Where(rating => rating.ContributedComment == "2")
+                .OrderByDescending(rating => rating.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task<Boolean> CheckIfUserHaveContributedCommentEqual1OrNot(User user)
+        {
+            return await _context.Ratings
+                .Where(rating => rating.ReviewerId == user.Id && rating.ContributedComment == "1")
+                .AnyAsync();
+        }
+        public async Task<Boolean> CheckIfUserHaveContributedCommentEqual2OrNot(User user)
+        {
+            return await _context.Ratings
+                .Where(rating => rating.ReviewerId == user.Id && rating.ContributedComment == "2")
+                .AnyAsync();
+        }
     }
 }
