@@ -56,6 +56,7 @@ builder.Services.AddScoped<JobRepo>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<RecruiterRepo>();
 builder.Services.AddScoped<CategoryRepo>();
+builder.Services.AddScoped<RatingRepo>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IApplicationServices, ApplicationServices>();

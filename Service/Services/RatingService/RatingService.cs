@@ -35,7 +35,7 @@ namespace Service.Services.RatingService
         {
             return await ratingRepo.GetRatingsByReviewerIdAsync(userId);
         }
-        public async Task AddRatingAsync(RatingDto rating, Guid userId)
+        public async Task AddRatingAsync(RatingDtoCreate rating, Guid userId)
         {
             if (rating == null) throw new ArgumentNullException(nameof(rating));
             var user = await userManager.FindByIdAsync(userId.ToString());
@@ -69,6 +69,24 @@ namespace Service.Services.RatingService
             ratingRepo.Delete(rating);
             await ratingRepo.SaveChangesAsync();
         }
+        public async Task<bool> CheckIfUserHaveContributedCommentEqual1OrNot(User user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user), "User not found.");
+            return await ratingRepo.CheckIfUserHaveContributedCommentEqual1OrNot(user);
+        }
+        public async Task<bool> CheckIfUserHaveContributedCommentEqual2OrNot(User user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user), "User not found.");
+            return await ratingRepo.CheckIfUserHaveContributedCommentEqual2OrNot(user);
+        }
+        public async Task<List<Rating>> GetRatingsByContributed1()
+        {
+            return await ratingRepo.GetAllRatingsSortByCreateDateContributedCommentEqual1Async();
+        }
+        public async Task<List<Rating>> GetRatingsByContributed2()
+        {
+            return await ratingRepo.GetAllRatingsSortByCreateDateContributedCommentEqual2Async();
+        }
         public class RatingDto
         {
             public Guid RatingId { get; set; }
@@ -76,5 +94,12 @@ namespace Service.Services.RatingService
             public string Comment { get; set; }
             public string ContributedComment { get; set; }
         }
+        public class RatingDtoCreate
+        {
+            public int? Rating1 { get; set; }
+            public string Comment { get; set; }
+            public string ContributedComment { get; set; }
+        }
+
     }
 }
