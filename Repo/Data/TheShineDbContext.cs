@@ -74,7 +74,7 @@ namespace Repo.Data
         //    => optionsBuilder.UseSqlServer(GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlServer(GetConnectionString());
+            => optionsBuilder.UseMySQL(GetConnectionString());
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -97,7 +97,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.CandidateId).HasName("PK__candidat__39BD4C18354A8933");
 
-                entity.Property(e => e.CandidateId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Featured).HasDefaultValue(false);
                 entity.Property(e => e.IncomeRange).HasDefaultValue("1-3M");
                 entity.Property(e => e.Status).HasDefaultValue("Chua nh?n vi?c");
@@ -156,7 +155,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.InvitationId).HasName("PK__invitati__94B74D7C19DB176C");
 
-                entity.Property(e => e.InvitationId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.SentAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Pending");
 
@@ -173,7 +171,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.JobId).HasName("PK__jobs__6E32B6A5C5F2B37E");
 
-                entity.Property(e => e.JobId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.IsUrgent).HasDefaultValue(false);
                 entity.Property(e => e.Location).HasDefaultValue("Ho Chi Minh City");
                 entity.Property(e => e.PostedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -212,7 +209,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.NotificationId).HasName("PK__notifica__E059842F6357338B");
 
-                entity.Property(e => e.NotificationId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.IsRead).HasDefaultValue(false);
 
@@ -225,7 +221,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.PaymentId).HasName("PK__payments__ED1FC9EAC80CA886");
 
-                entity.Property(e => e.PaymentId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Status).HasDefaultValue("Pending");
 
                 entity.HasOne(d => d.User).WithMany(p => p.Payment)
@@ -237,7 +232,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.RatingId).HasName("PK__ratings__D35B278B9864B1A5");
 
-                entity.Property(e => e.RatingId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.Reviewer).WithMany(p => p.Ratings).HasConstraintName("FK__ratings__reviewe__18EBB532");
@@ -247,7 +241,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.RecruiterId).HasName("PK__recruite__42ABA257E9F06E1E");
 
-                entity.Property(e => e.RecruiterId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Verified).HasDefaultValue(false);
 
                 entity.HasOne(d => d.User).WithOne(p => p.Recruiter)
@@ -259,7 +252,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.SubscriptionId).HasName("PK__subscrip__863A7EC161176C70");
 
-                entity.Property(e => e.SubscriptionId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.IsActivated).HasDefaultValue(true);
                 entity.Property(e => e.StartDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Status).HasDefaultValue("Active");
@@ -273,14 +265,12 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.TagId).HasName("PK__tags__4296A2B61A399BE7");
 
-                entity.Property(e => e.TagId).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PK__users__B9BE370FA57EB208");
 
-                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Location).HasDefaultValue("Ho Chi Minh City");
                 entity.Property(e => e.RememberMe).HasDefaultValue(false);
@@ -292,7 +282,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.VerificationId).HasName("PK__verifica__24F179694FEA4951");
 
-                entity.Property(e => e.VerificationId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Status).HasDefaultValue("Pending");
 
                 entity.HasOne(d => d.User).WithOne(p => p.Verification)
@@ -304,7 +293,6 @@ namespace Repo.Data
             {
                 entity.HasKey(e => e.HistoryId).HasName("PK__work_his__096AA2E992B2BFDA");
 
-                entity.Property(e => e.HistoryId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.Candidate).WithMany(p => p.WorkHistories)

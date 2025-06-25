@@ -54,7 +54,7 @@ namespace FastWork.Controllers
 
             return Ok(new { link = downloadUrl , id = entity.FileId});
         }
-        //[HttpPost("uploadMySql")]
+        //[HttpPost("upload")]
         //public async Task<IActionResult> UploadFileMySql(IFormFile file)
         //{
         //    if (file == null || file.Length == 0)
