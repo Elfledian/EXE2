@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Repo.Entities;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Repo.Data;
 using File = Repo.Entities.File;
@@ -10,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Service.Helper;
 using System.Security.Claims;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace FastWork.Controllers
 {
@@ -28,74 +25,74 @@ namespace FastWork.Controllers
         }
 
         // POST: api/File/upload
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadSQLServer(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
-
-            using var ms = new MemoryStream();
-            await file.CopyToAsync(ms);
-
-            var entity = new File
-            {
-                FileId = Guid.NewGuid(),
-                FileName = file.FileName,
-                FileType = Path.GetExtension(file.FileName),
-                FileData = ms.ToArray(),
-                ContentType = file.ContentType,
-                UploadDate = DateTime.UtcNow
-            };
-
-            _context.Set<File>().Add(entity);
-            await _context.SaveChangesAsync();
-
-            var downloadUrl = Url.Action(nameof(Download), "File", new { id = entity.FileId }, Request.Scheme);
-
-            return Ok(new { link = downloadUrl , id = entity.FileId});
-        }
         //[HttpPost("upload")]
-        //public async Task<IActionResult> UploadFileMySql(IFormFile file)
+        //public async Task<IActionResult> UploadSQLServer(IFormFile file)
         //{
         //    if (file == null || file.Length == 0)
-        //        return BadRequest("No file uploaded");
+        //        return BadRequest("No file uploaded.");
 
-        //    byte[] fileBytes;
-        //    using (var ms = new MemoryStream())
+        //    using var ms = new MemoryStream();
+        //    await file.CopyToAsync(ms);
+
+        //    var entity = new File
         //    {
-        //        await file.CopyToAsync(ms);
-        //        fileBytes = ms.ToArray();
-        //    }
+        //        FileId = Guid.NewGuid(),
+        //        FileName = file.FileName,
+        //        FileType = Path.GetExtension(file.FileName),
+        //        FileData = ms.ToArray(),
+        //        ContentType = file.ContentType,
+        //        UploadDate = DateTime.UtcNow
+        //    };
 
-        //    var fileId = Guid.NewGuid();
-        //    var fileName = file.FileName;
-        //    var contentType = file.ContentType;
-        //    var uploadDate = DateTime.UtcNow;
+        //    _context.Set<File>().Add(entity);
+        //    await _context.SaveChangesAsync();
 
-        //    var connectionString = _context.Database.GetDbConnection().ConnectionString;
+        //    var downloadUrl = Url.Action(nameof(Download), "File", new { id = entity.FileId }, Request.Scheme);
 
-        //    await using var connection = new MySqlConnection(connectionString);
-        //    await connection.OpenAsync();
-
-        //    var cmdText = @"
-        //INSERT INTO files (file_id, file_name, file_type, content_type, file_data, upload_date)
-        //VALUES (@fileId, @fileName, @fileType, @contentType, @fileData, @uploadDate)";
-
-        //    await using var cmd = new MySqlCommand(cmdText, connection);
-        //    cmd.Parameters.AddWithValue("@fileId", fileId.ToString());
-        //    cmd.Parameters.AddWithValue("@fileName", fileName);
-        //    cmd.Parameters.AddWithValue("@fileType", contentType);
-        //    cmd.Parameters.AddWithValue("@contentType", contentType);
-        //    cmd.Parameters.Add("@fileData", MySqlDbType.LongBlob).Value = fileBytes;
-        //    cmd.Parameters.AddWithValue("@uploadDate", uploadDate);
-
-        //    var rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-        //    if (rowsAffected == 1)
-        //        return Ok(new { id = fileId });
-        //    else
-        //        return StatusCode(500, "Error inserting file");
+        //    return Ok(new { link = downloadUrl , id = entity.FileId});
         //}
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFileMySql(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
+            {
+                await file.CopyToAsync(ms);
+                fileBytes = ms.ToArray();
+            }
+
+            var fileId = Guid.NewGuid();
+            var fileName = file.FileName;
+            var contentType = file.ContentType;
+            var uploadDate = DateTime.UtcNow;
+
+            var connectionString = _context.Database.GetDbConnection().ConnectionString;
+
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            var cmdText = @"
+        INSERT INTO files (file_id, file_name, file_type, content_type, file_data, upload_date)
+        VALUES (@fileId, @fileName, @fileType, @contentType, @fileData, @uploadDate)";
+
+            await using var cmd = new MySqlCommand(cmdText, connection);
+            cmd.Parameters.AddWithValue("@fileId", fileId.ToString());
+            cmd.Parameters.AddWithValue("@fileName", fileName);
+            cmd.Parameters.AddWithValue("@fileType", contentType);
+            cmd.Parameters.AddWithValue("@contentType", contentType);
+            cmd.Parameters.Add("@fileData", MySqlDbType.LongBlob).Value = fileBytes;
+            cmd.Parameters.AddWithValue("@uploadDate", uploadDate);
+
+            var rowsAffected = await cmd.ExecuteNonQueryAsync();
+            var downloadUrl = Url.Action(nameof(Download), "File", new { id = fileId }, Request.Scheme);
+            if (rowsAffected == 1)
+                return Ok(new { link = downloadUrl, id = fileId });
+            else
+                return StatusCode(500, "Error inserting file");
+        }
 
 
         // GET: api/File/download/{id}
