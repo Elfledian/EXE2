@@ -20,7 +20,7 @@ namespace Service.Services
         private readonly PayOS _payOS;
 
         private readonly PaymentRepo _paymentRepo;
-        private readonly SubscriptionRepo _subscriptionRepo; 
+        private readonly SubscriptionRepo _subscriptionRepo;
         public PayOSService(IOptions<PayOSSettings> options, PaymentRepo paymentRepo)
         {
             var settings = options.Value;
@@ -181,6 +181,70 @@ namespace Service.Services
                 }
             }
         }
-    }
+        public async Task<List<PaymentSummaryDto>> GetDailyTotalsAsync(DateTime startDate, DateTime endDate)
+        {
+            var payments = await _paymentRepo.GetAllPaymentsAsync(startDate, endDate, "PAID");
+            var result = payments
+                .Where(p => p.PaidAt.HasValue)
+                .GroupBy(p => p.PaidAt.Value.Date)
+                .OrderBy(g => g.Key)
+                .Select(g => new PaymentSummaryDto
+                {
+                    Time = g.Key.ToString("yyyy-MM-dd"),
+                    TotalAmount = g.Sum(p => p.Amount)
+                })
+                .ToList();
+            return result;
+        }
 
+        public async Task<List<PaymentSummaryDto>> GetMonthlyTotalsAsync(int startMonth, int startYear, int endMonth, int endYear)
+        {
+            // Build start and end dates from month/year
+            var startDate = new DateTime(startYear, startMonth, 1);
+            var endDate = new DateTime(endYear, endMonth, DateTime.DaysInMonth(endYear, endMonth));
+            var payments = await _paymentRepo.GetAllPaymentsAsync(startDate, endDate, "PAID");
+            var result = payments
+                .Where(p => p.PaidAt.HasValue)
+                .GroupBy(p => new { p.PaidAt.Value.Year, p.PaidAt.Value.Month })
+                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
+                .Select(g => new PaymentSummaryDto
+                {
+                    Time = $"{g.Key.Year}-{g.Key.Month:D2}",
+                    TotalAmount = g.Sum(p => p.Amount)
+                })
+                .ToList();
+            return result;
+        }
+        public async Task<List<PaymentSummaryDto>> GetDataForChartAsync(String DayOrMonth, DateTime startDate, DateTime endDate)
+        {
+            var result = new List<PaymentSummaryDto>();
+            if (startDate > endDate)
+            {
+                var temp = startDate;
+                startDate = endDate;
+                endDate = temp;
+            }
+            if (DayOrMonth.ToLower() == "day")
+            {
+                result = await GetDailyTotalsAsync(startDate, endDate);
+                return result;
+            }
+            else if (DayOrMonth.ToLower() == "month")
+            {
+                // Extract start and end month/year from the provided dates
+                int startMonth = startDate.Month;
+                int startYear = startDate.Year;
+                int endMonth = endDate.Month;
+                int endYear = endDate.Year;
+                result = await GetMonthlyTotalsAsync(startMonth, startYear, endMonth, endYear);
+                return result;
+            }
+            else
+            {
+                result = new List<PaymentSummaryDto>();
+            }
+            return result;
+        }
+
+    }
 }
