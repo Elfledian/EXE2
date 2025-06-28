@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repo.Entities;
 using Repo.Repositories;
+using Service.DTO;
+using static Repo.Repositories.RatingRepo;
 
 namespace Service.Services.RatingService
 {
@@ -87,19 +89,47 @@ namespace Service.Services.RatingService
         {
             return await ratingRepo.GetAllRatingsSortByCreateDateContributedCommentEqual2Async();
         }
-        public class RatingDto
+        public async Task<List<RatingPieChartDto>> GetRatingPieChartAsync()
         {
-            public Guid RatingId { get; set; }
-            public int? Rating1 { get; set; }
-            public string Comment { get; set; }
-            public string ContributedComment { get; set; }
+            var ratings = await ratingRepo.GetRatingPieChartAsync();
+            if (ratings == null || !ratings.Any())
+            {
+                // Return 0% for all stars if no ratings
+                return Enumerable.Range(1, 5).Select(i => new RatingPieChartDto
+                {
+                    Star = i,
+                    Percentage = 0
+                }).ToList();
+            }
+            return ratings;
         }
-        public class RatingDtoCreate
+        public async Task<List<RatingPieChartDto>> GetRatingPieChartAsync1()
         {
-            public int? Rating1 { get; set; }
-            public string Comment { get; set; }
-            public string ContributedComment { get; set; }
+            var ratings = await ratingRepo.GetRatingPieChartAsync1();
+            if (ratings == null || !ratings.Any())
+            {
+                // Return 0% for all stars if no ratings
+                return Enumerable.Range(1, 5).Select(i => new RatingPieChartDto
+                {
+                    Star = i,
+                    Percentage = 0
+                }).ToList();
+            }
+            return ratings;
         }
-
+        public async Task<List<RatingPieChartDto>> GetRatingPieChartAsync2()
+        {
+            var ratings = await ratingRepo.GetRatingPieChartAsync2();
+            if (ratings == null || !ratings.Any())
+            {
+                // Return 0% for all stars if no ratings
+                return Enumerable.Range(1, 5).Select(i => new RatingPieChartDto
+                {
+                    Star = i,
+                    Percentage = 0
+                }).ToList();
+            }
+            return ratings;
+        }
     }
 }

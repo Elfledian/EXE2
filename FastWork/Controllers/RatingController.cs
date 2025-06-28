@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Repo.Entities;
+using Service.DTO;
 using Service.Services.RatingService;
 
 namespace FastWork.Controllers
@@ -18,7 +19,7 @@ namespace FastWork.Controllers
             _userManager = userManager;
         }
         [HttpPost("add")]
-        public async Task<IActionResult> AddRating([FromBody] RatingService.RatingDtoCreate rating)
+        public async Task<IActionResult> AddRating([FromBody] RatingDtoCreate rating)
         {
             if (rating == null)
             {
@@ -66,7 +67,7 @@ namespace FastWork.Controllers
             return Ok(ratings);
         }
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateRating([FromBody] RatingService.RatingDto rating)
+        public async Task<IActionResult> UpdateRating([FromBody] RatingDto rating)
         {
             if (rating == null)
             {
@@ -113,6 +114,24 @@ namespace FastWork.Controllers
             }
             var result = await _ratingService.CheckIfUserHaveContributedCommentEqual2OrNot(user);
             return Ok(result);
+        }
+        [HttpGet("pie-chart-all")]
+        public async Task<IActionResult> GetRatingPieChart()
+        {
+            var pieChartData = await _ratingService.GetRatingPieChartAsync();
+            return Ok(pieChartData);
+        }
+        [HttpGet("pie-chart1")]
+        public async Task<IActionResult> GetRatingPieChart1()
+        {
+            var pieChartData = await _ratingService.GetRatingPieChartAsync1();
+            return Ok(pieChartData);
+        }
+        [HttpGet("pie-chart2")]
+        public async Task<IActionResult> GetRatingPieChart2()
+        {
+            var pieChartData = await _ratingService.GetRatingPieChartAsync2();
+            return Ok(pieChartData);
         }
     }
 }
