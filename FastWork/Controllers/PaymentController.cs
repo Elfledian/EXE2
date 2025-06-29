@@ -51,32 +51,9 @@ namespace FastWork.Controllers
         [HttpPost("paymentChartData")]
         public async Task<IActionResult> GetPaymentChartData([FromBody] PaymentSummaryRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            // Validate the date range
-            if (request.startYear < 1 || request.endYear < 1 ||
-                request.startMonth < 1 || request.startMonth > 12 ||
-                request.endMonth < 1 || request.endMonth > 12 ||
-                request.startDay < 1 || request.startDay > 31 ||
-                request.endDay < 1 || request.endDay > 31)
-            {
-                if(request.dayOrMonth.ToLower() != "day" && request.dayOrMonth.ToLower() != "month")
-                request = new PaymentSummaryRequest();
-                if(request.dayOrMonth.ToLower() == "month")
-                request = new PaymentSummaryRequest() { 
-                    dayOrMonth = "month",
-                    startMonth = 1,
-                    startYear = DateTime.Now.Year,
-                    startDay = 1
-                };
-            }
-            var startDate = new DateTime(request.startYear, request.startMonth, request.startDay);
-            var endDate = new DateTime(request.endYear, request.endMonth, request.endDay);
             try
             {
-                var chartData = await _payOSService.GetDataForChartAsync(request.dayOrMonth, startDate, endDate);
+                var chartData = await _payOSService.GetDataForChartAsync(request);
                 return Ok(chartData);
             }
             catch (Exception ex)
