@@ -232,6 +232,47 @@ namespace Service.Services
             }
             return result;
         }
+        public async Task<List<PaymentSummaryDto>> GetDataForChartAsync(PaymentSummaryRequest request)
+        {
+            var result = new List<PaymentSummaryDto>();
+            if (request == null)
+                return result;
+
+            // Normalize input
+            var dayOrMonth = request.dayOrMonth?.ToLower() ?? "day";
+
+            DateTime startDate, endDate;
+
+            if (dayOrMonth == "month")
+            {
+                // Use only year and month, day is always 1 for start, last day for end
+                startDate = new DateTime(request.startYear, request.startMonth, 1);
+                endDate = new DateTime(request.endYear, request.endMonth, DateTime.DaysInMonth(request.endYear, request.endMonth));
+                if (startDate > endDate)
+                {
+                    var tempMonth = startDate;
+                    startDate = endDate;
+                    endDate = tempMonth;
+                }
+                result = await GetMonthlyTotalsAsync(startDate.Month, startDate.Year, endDate.Month, endDate.Year);
+            }
+            else // "day" or default
+            {
+                // Use full date
+                startDate = new DateTime(request.startYear, request.startMonth, request.startDay);
+                endDate = new DateTime(request.endYear, request.endMonth, request.endDay);
+                if (startDate > endDate)
+                {
+                    var tempDate = startDate;
+                    startDate = endDate;
+                    endDate = tempDate;
+                }
+                result = await GetDailyTotalsAsync(startDate, endDate);
+            }
+
+            return result;
+        }
+
 
         public async Task<List<PaymentSummaryDto>> GetDataForChartAsync(String DayOrMonth, DateTime startDate, DateTime endDate)
         {
