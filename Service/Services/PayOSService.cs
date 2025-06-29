@@ -184,37 +184,55 @@ namespace Service.Services
         public async Task<List<PaymentSummaryDto>> GetDailyTotalsAsync(DateTime startDate, DateTime endDate)
         {
             var payments = await _paymentRepo.GetAllPaymentsAsync(startDate, endDate, "PAID");
-            var result = payments
+            var paymentGroups = payments
                 .Where(p => p.PaidAt.HasValue)
                 .GroupBy(p => p.PaidAt.Value.Date)
-                .OrderBy(g => g.Key)
-                .Select(g => new PaymentSummaryDto
+                .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
+
+            var result = new List<PaymentSummaryDto>();
+            for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
+            {
+                paymentGroups.TryGetValue(date, out var total);
+                result.Add(new PaymentSummaryDto
                 {
-                    Time = g.Key.ToString("yyyy-MM-dd"),
-                    TotalAmount = g.Sum(p => p.Amount)
-                })
-                .ToList();
+                    Time = date.ToString("yyyy-MM-dd"),
+                    TotalAmount = total
+                });
+            }
             return result;
         }
 
+
         public async Task<List<PaymentSummaryDto>> GetMonthlyTotalsAsync(int startMonth, int startYear, int endMonth, int endYear)
         {
-            // Build start and end dates from month/year
             var startDate = new DateTime(startYear, startMonth, 1);
             var endDate = new DateTime(endYear, endMonth, DateTime.DaysInMonth(endYear, endMonth));
             var payments = await _paymentRepo.GetAllPaymentsAsync(startDate, endDate, "PAID");
-            var result = payments
+            var paymentGroups = payments
                 .Where(p => p.PaidAt.HasValue)
                 .GroupBy(p => new { p.PaidAt.Value.Year, p.PaidAt.Value.Month })
-                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
-                .Select(g => new PaymentSummaryDto
+                .ToDictionary(
+                    g => (g.Key.Year, g.Key.Month),
+                    g => g.Sum(p => p.Amount)
+                );
+
+            var result = new List<PaymentSummaryDto>();
+            var current = new DateTime(startYear, startMonth, 1);
+            var last = new DateTime(endYear, endMonth, 1);
+
+            while (current <= last)
+            {
+                paymentGroups.TryGetValue((current.Year, current.Month), out var total);
+                result.Add(new PaymentSummaryDto
                 {
-                    Time = $"{g.Key.Year}-{g.Key.Month:D2}",
-                    TotalAmount = g.Sum(p => p.Amount)
-                })
-                .ToList();
+                    Time = $"{current.Year}-{current.Month:D2}",
+                    TotalAmount = total
+                });
+                current = current.AddMonths(1);
+            }
             return result;
         }
+
         public async Task<List<PaymentSummaryDto>> GetDataForChartAsync(String DayOrMonth, DateTime startDate, DateTime endDate)
         {
             var result = new List<PaymentSummaryDto>();
