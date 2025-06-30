@@ -61,7 +61,7 @@ namespace FastWork.Controllers
             {
                 Id = Guid.NewGuid(),
                 UserName = "admin",
-                Email = "admin",
+                Email = "admin@gmail.com",
                 Name = "admin",
                 Phone = "admin",
                 CreatedAt = DateTime.UtcNow,
