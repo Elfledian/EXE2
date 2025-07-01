@@ -18,5 +18,11 @@ namespace FastWork.Controllers
             var categories = await _categoryService.GetAllCategoriesAsync();
             return Ok(categories);
         }
+        [HttpPost("AddSample")]
+        public IActionResult AddSample()
+        {
+            _categoryService.AddSample();
+            return Ok(new { Message = "Sample categories added successfully." });
+        }
     }
 }
