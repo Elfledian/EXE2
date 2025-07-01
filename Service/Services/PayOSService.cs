@@ -55,7 +55,7 @@ namespace Service.Services
                 Amount = request.Amount,
                 TransactionId = response.orderCode.ToString(),
                 Status = response.status, // Set initial status from PayOS response
-                PaidAt = DateTime.UtcNow.AddHours(-7) // Consider updating this based on actual payment time
+                PaidAt = DateTime.UtcNow.AddHours(-5) // Consider updating this based on actual payment time
             };
 
             await _paymentRepo.AddPaymentAsync(payment);
