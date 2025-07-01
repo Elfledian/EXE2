@@ -40,8 +40,16 @@ namespace Service.Services.RatingService
         public async Task AddRatingAsync(RatingDtoCreate rating, Guid userId)
         {
             if (rating == null) throw new ArgumentNullException(nameof(rating));
+            if (rating.ContributedComment != "1" && rating.ContributedComment != "2")
+                throw new ArgumentException("ContributedComment must be either '1' or '2'.", nameof(rating.ContributedComment));
+            if (rating.Rating1 < 1 || rating.Rating1 > 5)
+                throw new ArgumentOutOfRangeException(nameof(rating.Rating1), "Rating must be between 1 and 5.");
             var user = await userManager.FindByIdAsync(userId.ToString());
             if (user == null) throw new ArgumentNullException(nameof(user), "User not found.");
+            if (await ratingRepo.CheckIfUserHaveContributedCommentEqual1OrNot(user) && rating.ContributedComment == "1")
+                throw new InvalidOperationException("User has already contributed a comment with value '1'.");
+            if (await ratingRepo.CheckIfUserHaveContributedCommentEqual2OrNot(user) && rating.ContributedComment == "2")
+                throw new InvalidOperationException("User has already contributed a comment with value '2'.");
             var ratingEntity = new Rating
             {
                 RatingId = Guid.NewGuid(),
