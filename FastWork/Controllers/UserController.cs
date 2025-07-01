@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using Repo.Data;
+using Service.Services.CategoryService;
 
 namespace FastWork.Controllers
 {
@@ -24,6 +25,7 @@ namespace FastWork.Controllers
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailSenderService;
+        private readonly ICategoryService _categoryService;
         private readonly TheShineDbContext _context;
         private readonly string _frontendUrl;
 
@@ -32,12 +34,14 @@ namespace FastWork.Controllers
             RoleManager<IdentityRole<Guid>> roleManager,
             IConfiguration configuration,
             IEmailService emailSenderService,
+            ICategoryService categoryService,
             TheShineDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _emailSenderService = emailSenderService;
+            _categoryService = categoryService;
             _frontendUrl = configuration["Url:Frontend"] ?? "https://localhost:5044";
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -71,6 +75,7 @@ namespace FastWork.Controllers
             var result = await _userManager.CreateAsync(user, "Admin1?");
             if (result.Succeeded)
             {
+                _categoryService.AddSample();
                 if (!await _roleManager.RoleExistsAsync("Admin"))
                 {
                     var roleResult = await _roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN" });

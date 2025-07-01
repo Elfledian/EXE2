@@ -5,5 +5,6 @@ namespace Service.Services.CategoryService
     public interface ICategoryService
     {
         Task<List<Category>> GetAllCategoriesAsync();
+        void AddSample();
     }
 }

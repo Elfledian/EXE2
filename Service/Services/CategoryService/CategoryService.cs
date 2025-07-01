@@ -20,5 +20,9 @@ namespace Service.Services.CategoryService
         {
             return await _categoryRepo.GetAll().ToListAsync();
         }
+        public void AddSample()
+        {
+            _categoryRepo.Add5SampleCategories();
+        }
     }
 }
