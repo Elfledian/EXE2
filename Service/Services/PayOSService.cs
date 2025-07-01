@@ -114,7 +114,7 @@ namespace Service.Services
             {
                 if (DateTime.TryParse(webhookData.transactionDateTime, out var parsedDate))
                 {
-                    transactionDate = parsedDate.ToUniversalTime().AddHours(7); // Convert to GMT+7
+                    transactionDate = parsedDate.ToUniversalTime(); // Convert to GMT+7
                 }
             }
 
@@ -140,8 +140,8 @@ namespace Service.Services
                         Price = webhookData.amount,
                         Subtitle = webhookData.description,
                         OriginalPrice = payment.Amount,
-                        StartDate = transactionDate ?? DateTime.UtcNow.AddHours(7),
-                        EndDate = transactionDate.HasValue ? transactionDate.Value.AddDays(30) : DateTime.UtcNow.AddHours(7).AddDays(30),
+                        StartDate = transactionDate ?? DateTime.UtcNow,
+                        EndDate = transactionDate.HasValue ? transactionDate.Value.AddDays(30) : DateTime.UtcNow.AddDays(30),
                         Status = "Active"
                     };
                     // Assuming a subscription repository exists
@@ -157,7 +157,7 @@ namespace Service.Services
                     Amount = webhookData.amount,
                     TransactionId = webhookData.orderCode.ToString(),
                     Status = status,
-                    PaidAt = status == "PAID" ? (transactionDate ?? DateTime.UtcNow.AddHours(7)) : DateTime.UtcNow.AddHours(7)
+                    PaidAt = status == "PAID" ? (transactionDate ?? DateTime.UtcNow) : DateTime.UtcNow
                 };
                 await _paymentRepo.AddPaymentAsync(payment);
 
@@ -172,8 +172,8 @@ namespace Service.Services
                         Price = webhookData.amount,
                         Subtitle = webhookData.description,
                         OriginalPrice = payment.Amount,
-                        StartDate = transactionDate ?? DateTime.UtcNow.AddHours(7),
-                        EndDate = transactionDate.HasValue ? transactionDate.Value.AddDays(30) : DateTime.UtcNow.AddHours(7).AddDays(30),
+                        StartDate = transactionDate ?? DateTime.UtcNow,
+                        EndDate = transactionDate.HasValue ? transactionDate.Value.AddDays(30) : DateTime.UtcNow.AddDays(30),
                         Status = "Active"
                     };
                     // Assuming a subscription repository exists
