@@ -24,6 +24,12 @@ namespace FastWork.Controllers
             var jobs = await _jobService.GetAllJobsAsync();
             return Ok(jobs);
         }
+        [HttpGet("GetAllWithImg")]
+        public async Task<IActionResult> GetAllWithImage()
+        {
+            var jobs = await _jobService.GetAllJobsWithCompanyLogoAsync();
+            return Ok(jobs);
+        }
         [HttpGet("{jobId}")]
         public async Task<IActionResult> GetById(Guid jobId)
         {
