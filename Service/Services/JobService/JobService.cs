@@ -29,6 +29,25 @@ namespace Service.Services.JobService
         {
             return await _jobRepo.GetAll().ToListAsync();
         }
+        public class JobWithCompanyLogoDto
+        {
+            public Job Job { get; set; }
+            public Guid? LogoFileId { get; set; }
+        }
+        public async Task<List<JobWithCompanyLogoDto>> GetAllJobsWithCompanyLogoAsync()
+        {
+            // Ensure Company is included for each Job
+            var jobs = await _jobRepo.GetAll()
+                .Include(j => j.Company)
+                .Select(j => new JobWithCompanyLogoDto
+                {
+                    Job = j,
+                    LogoFileId = j.Company.LogoFileId
+                })
+                .ToListAsync();
+
+            return jobs;
+        }
         public async Task<Job> GetJobByIdAsync(Guid jobId)
         {
             return await _jobRepo.GetEntityByIdAsync(jobId);

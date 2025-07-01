@@ -28,6 +28,51 @@ namespace FastWork.Controllers
             var companies = await _context.Companies.ToListAsync();
             return Ok(companies);
         }
+        public class createCompanyHvImg
+        {
+            public string name { get; set; }
+            public string link { get; set; }
+            public Guid? logoFileId { get; set; }
+        }
+        [HttpPost("withImg")]
+        public async Task<ActionResult> CreateCompany(createCompanyHvImg hehe)
+        {
+            if (string.IsNullOrEmpty(hehe.name) || string.IsNullOrEmpty(hehe.link))
+            {
+                return BadRequest("Name and link are required.");
+            }
+            if (User?.Identity?.IsAuthenticated != true || User.FindFirst(ClaimTypes.NameIdentifier) == null)
+            {
+                return Unauthorized(new { Message = "Authentication required or invalid token." });
+            }
+
+            Guid userId;
+            try
+            {
+                userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException("User ID claim not found."));
+            }
+            catch (FormatException)
+            {
+                return Unauthorized(new { Message = "Invalid user ID format in token." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { Message = ex.Message });
+            }
+
+
+            var company = new Company
+            {
+                CompanyName = hehe.name,
+                Website = hehe.link,
+                CreatedAt = DateTime.UtcNow,
+                LogoFileId = hehe.logoFileId,
+                RecruiterId = userId 
+            };
+            await _context.Companies.AddAsync(company);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetAllCompanies), new { id = company.CompanyId }, company);
+        }
         public class createCompany
         {
             public string name { get; set; }

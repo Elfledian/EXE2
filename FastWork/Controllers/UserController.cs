@@ -153,6 +153,21 @@ namespace FastWork.Controllers
                     return BadRequest(new AppResponse<object>().SetErrorResponse("RoleAssignment", roleAssignmentResult.Errors.Select(e => e.Description).ToArray()));
                 }
 
+                Candidate candidate = new Candidate()
+                {
+                    CandidateId = Guid.NewGuid(),
+                    Education = "Graduated",
+                    Gender = "Male",
+                    IncomeRange = "$2000",
+                    Status = "Intern",
+                    Verified = false,
+                    Featured = false,
+                    UserId = user.Id,
+                    User = user
+                };
+                await _context.Candidates.AddAsync(candidate);
+                await _context.SaveChangesAsync();
+
                 Console.WriteLine($"Role 'Candidate' assigned to user {user.Email}");
 
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
