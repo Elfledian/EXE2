@@ -304,6 +304,12 @@ namespace Service.Services
             }
             return result;
         }
-
+        public async Task<decimal> GetTotalMoneyReceivedAsync()
+        {
+            // Get all payments with status "PAID"
+            var payments = await _paymentRepo.GetAllPaymentsAsync(null, null, "PAID");
+            // Sum the Amount of all paid payments
+            return payments.Sum(p => p.Amount);
+        }
     }
 }
