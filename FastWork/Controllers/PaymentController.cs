@@ -61,6 +61,19 @@ namespace FastWork.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+        [HttpGet("total")]
+        public async Task<IActionResult> TotalMoneyReceive()
+        {
+            try
+            {
+                var total = await _payOSService.GetTotalMoneyReceivedAsync();
+                return Ok(total);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 
 }
