@@ -102,7 +102,7 @@ namespace FastWork.Controllers
                 return Unauthorized("User not authenticated.");
             }
             var result = await _ratingService.CheckIfUserHaveContributedCommentEqual1OrNot(user);
-            result = true;
+            result = false;
             return Ok(result);
         }
         [HttpGet("check-contributed-2")]
@@ -114,7 +114,7 @@ namespace FastWork.Controllers
                 return Unauthorized("User not authenticated.");
             }
             var result = await _ratingService.CheckIfUserHaveContributedCommentEqual2OrNot(user);
-            result = true;
+            result = false;
             return Ok(result);
         }
         [HttpGet("pie-chart-all")]
