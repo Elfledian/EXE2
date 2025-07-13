@@ -69,7 +69,7 @@ namespace Repo.Repositories
         public async Task<List<Application>> GetApplicationsByCandidateIdAsync(Guid candidateId)
         {
             return await _context.Applications
-                .Where(a => a.CandidateId == candidateId)
+                .Where(a => a.CandidateId == candidateId).Include(a => a.Candidate).ThenInclude(c => c.User)
                 .Include(a => a.Job)
                 .ToListAsync();
         }
@@ -77,13 +77,13 @@ namespace Repo.Repositories
         {
             return await _context.Applications
                 .Where(a => a.JobId == jobId)
-                .Include(a => a.Candidate)
+                .Include(a => a.Candidate).ThenInclude(c => c.User)
                 .ToListAsync();
         }
         public async Task<Application> GetApplicationByIdAsync(Guid applicationId)
         {
             return await _context.Applications
-                .Include(a => a.Candidate)
+                .Include(a => a.Candidate).ThenInclude(c => c.User)
                 .Include(a => a.Job)
                 .FirstOrDefaultAsync(a => a.ApplicationId == applicationId);
         }
@@ -104,7 +104,7 @@ namespace Repo.Repositories
         public async Task<List<Application>> GetAllApplicationsAsync()
         {
             return await _context.Applications
-                .Include(a => a.Candidate)
+                .Include(a => a.Candidate).ThenInclude(c => c.User)
                 .Include(a => a.Job)
                 .ToListAsync();
         }
@@ -112,7 +112,7 @@ namespace Repo.Repositories
         {
             return await _context.Applications
                 .Where(a => a.Status == status)
-                .Include(a => a.Candidate)
+                .Include(a => a.Candidate).ThenInclude(c => c.User)
                 .Include(a => a.Job)
                 .ToListAsync();
         }
@@ -120,7 +120,7 @@ namespace Repo.Repositories
         {
             return await _context.Applications
                 .Where(a => a.InterviewType == interviewType)
-                .Include(a => a.Candidate)
+                .Include(a => a.Candidate).ThenInclude(c => c.User)
                 .Include(a => a.Job)
                 .ToListAsync();
         }
@@ -128,7 +128,7 @@ namespace Repo.Repositories
         {
             return await _context.Applications
                 .Where(a => a.AppliedAt >= startDate && a.AppliedAt <= endDate)
-                .Include(a => a.Candidate)
+                .Include(a => a.Candidate).ThenInclude(c => c.User)
                 .Include(a => a.Job)
                 .ToListAsync();
         }
