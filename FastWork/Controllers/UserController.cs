@@ -324,12 +324,6 @@ namespace FastWork.Controllers
         [HttpGet("user-info")]
         public IActionResult GetUserInfo()
         {
-            Console.WriteLine($"Request Processed at {DateTime.Now}: Path={HttpContext.Request.Path}, Method={HttpContext.Request.Method}");
-            Console.WriteLine($"Authorization Header: {Request.Headers["Authorization"]}");
-            Console.WriteLine($"Authentication Type: {User.Identity?.AuthenticationType}");
-            Console.WriteLine($"IsAuthenticated: {User.Identity?.IsAuthenticated}");
-            Console.WriteLine($"All Claims: {string.Join("\n", User.Claims.Select(c => $"{c.Type} = {c.Value}"))}");
-
             if (User.Identity?.IsAuthenticated != true)
             {
                 return Unauthorized(new
@@ -342,7 +336,8 @@ namespace FastWork.Controllers
             }
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Ok(new { UserId = userId });
+            var user = _userManager.FindByIdAsync(userId).Result;
+            return Ok(user);
         }
 
         [AllowAnonymous]
