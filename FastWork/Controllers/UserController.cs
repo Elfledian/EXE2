@@ -129,7 +129,7 @@ namespace FastWork.Controllers
                 Name = model.FullName,
                 Phone = model.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
-                EmailConfirmed = true
+                EmailConfirmed = false
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
